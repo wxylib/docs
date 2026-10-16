@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="300" viewBox="0 0 880 300" font-family="Helvetica, Arial, sans-serif">
+<rect width="880" height="300" rx="8" fill="#ffffff"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+<text x="20" y="30" font-size="16" font-weight="bold" fill="#222">wxy warp: plan, then fetch, then warp</text>
+<rect x="20" y="55" width="190" height="58" rx="6" fill="#eeeeee"/>
+<text x="115.0" y="81.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">GeoTIFF / COG</text>
+<text x="115.0" y="99.0" font-size="11" text-anchor="middle" fill="#222">wxy-tiff (async-tiff)</text>
+<path d="M210 84 L262 150" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="20" y="130" width="190" height="58" rx="6" fill="#eeeeee"/>
+<text x="115.0" y="156.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">Zarr</text>
+<text x="115.0" y="174.0" font-size="11" text-anchor="middle" fill="#222">wxy-zarr (zarrs, GeoZarr, CF)</text>
+<path d="M210 159 L262 150" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="20" y="205" width="190" height="58" rx="6" fill="#eeeeee"/>
+<text x="115.0" y="231.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">virtual Zarr</text>
+<text x="115.0" y="249.0" font-size="11" text-anchor="middle" fill="#222">wxy-virtual (Icechunk refs)</text>
+<path d="M210 234 L262 150" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="265" y="115" width="160" height="70" rx="6" fill="#dbe8f6"/>
+<text x="345.0" y="147.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1b2f45">Collection</text>
+<text x="345.0" y="165.0" font-size="11" text-anchor="middle" fill="#1b2f45">wxy-domain + wxy-source</text>
+<path d="M425 140 L465 90" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="468" y="55" width="180" height="58" rx="6" fill="#2f7d4f"/>
+<text x="558.0" y="81.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">1 plan</text>
+<text x="558.0" y="99.0" font-size="11" text-anchor="middle" fill="#ffffff">source window for target</text>
+<path d="M558 113 L558 130" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="468" y="130" width="180" height="58" rx="6" fill="#3f6fa8"/>
+<text x="558.0" y="156.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">2 fetch</text>
+<text x="558.0" y="174.0" font-size="11" text-anchor="middle" fill="#ffffff">only the chunks needed</text>
+<path d="M558 188 L558 205" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="468" y="205" width="180" height="58" rx="6" fill="#2f7d4f"/>
+<text x="558.0" y="231.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">3 warp</text>
+<text x="558.0" y="249.0" font-size="11" text-anchor="middle" fill="#ffffff">rwarp kernels</text>
+<path d="M648 234 L700 234" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="703" y="205" width="160" height="58" rx="6" fill="#eeeeee"/>
+<text x="783.0" y="231.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">GeoZarr out</text>
+<text x="783.0" y="249.0" font-size="11" text-anchor="middle" fill="#222">wxy-zarr writer</text>
+<text x="558" y="285" font-size="11" text-anchor="middle" fill="#555">wxy-warp; the plan is inspectable before any pixel is read</text>
+</svg>
