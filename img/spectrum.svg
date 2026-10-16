@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="230" viewBox="0 0 880 230" font-family="Helvetica, Arial, sans-serif">
+<rect width="880" height="230" rx="8" fill="#ffffff"/>
+<text x="20" y="30" font-size="16" font-weight="bold" fill="#222">The raster-vector spectrum: how positions are stored</text>
+<rect x="20" y="50" width="100" height="64" rx="6" fill="#9fd3b0"/>
+<text x="70.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#1d3b2a">R0</text>
+<text x="70.0" y="100" font-size="12" text-anchor="middle" fill="#1d3b2a">index only</text>
+<rect x="128" y="50" width="100" height="64" rx="6" fill="#2f7d4f"/>
+<text x="178.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#ffffff">R1</text>
+<text x="178.0" y="100" font-size="12" text-anchor="middle" fill="#ffffff">regular</text>
+<rect x="236" y="50" width="100" height="64" rx="6" fill="#9fd3b0"/>
+<text x="286.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#1d3b2a">R2</text>
+<text x="286.0" y="100" font-size="12" text-anchor="middle" fill="#1d3b2a">rectilinear</text>
+<rect x="344" y="50" width="100" height="64" rx="6" fill="#9fd3b0"/>
+<text x="394.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#1d3b2a">R3</text>
+<text x="394.0" y="100" font-size="12" text-anchor="middle" fill="#1d3b2a">curvilinear</text>
+<rect x="452" y="50" width="100" height="64" rx="6" fill="#9fd3b0"/>
+<text x="502.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#1d3b2a">R3'</text>
+<text x="502.0" y="100" font-size="12" text-anchor="middle" fill="#1d3b2a">fitted</text>
+<rect x="560" y="50" width="100" height="64" rx="6" fill="#e4e4e4"/>
+<text x="610.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#555555">R4</text>
+<text x="610.0" y="100" font-size="12" text-anchor="middle" fill="#555555">implicit mesh</text>
+<rect x="668" y="50" width="100" height="64" rx="6" fill="#e4e4e4"/>
+<text x="718.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#555555">R5</text>
+<text x="718.0" y="100" font-size="12" text-anchor="middle" fill="#555555">explicit mesh</text>
+<rect x="776" y="50" width="100" height="64" rx="6" fill="#e4e4e4"/>
+<text x="826.0" y="77" font-size="18" font-weight="bold" text-anchor="middle" fill="#555555">R6</text>
+<text x="826.0" y="100" font-size="12" text-anchor="middle" fill="#555555">features</text>
+<path d="M20 124 v8 H552 v-8" fill="none" stroke="#666"/>
+<text x="286.0" y="150" font-size="12" text-anchor="middle" fill="#444">indexed by (i, j): grids, structured meshes</text>
+<path d="M560 124 v8 H876 v-8" fill="none" stroke="#666"/>
+<text x="718.0" y="150" font-size="12" text-anchor="middle" fill="#444">indexed by element id: DGGS, meshes, features</text>
+<rect x="20" y="185" width="18" height="18" rx="3" fill="#2f7d4f"/>
+<text x="46" y="199" font-size="13" fill="#333">modelled and warped today</text>
+<rect x="290" y="185" width="18" height="18" rx="3" fill="#9fd3b0"/>
+<text x="316" y="199" font-size="13" fill="#333">modelled in wxy-domain</text>
+<rect x="560" y="185" width="18" height="18" rx="3" fill="#e4e4e4"/>
+<text x="586" y="199" font-size="13" fill="#333">named in the design, not built</text>
+</svg>

@@ -1,7 +1,109 @@
-# wxylib/docs
+# wxylib
 
-The wxylib book: tutorials, examples and technical explainers.
+wxylib is an early-stage set of Rust crates that takes the modular ideas
+inside GDAL (grids, georeferencing, chunked reads, warping, virtual
+datasets), gives each one its own small home, and builds on existing crates
+(async-tiff, zarrs, Icechunk, rwarp) rather than replacing them. GDAL is
+the inspiration and, for now, the test oracle.
 
-Design and roadmap: [wxylib/design](https://github.com/wxylib/design).
+**Status:** pre-release and moving fast. Nothing is on crates.io yet, APIs
+will change, and the design is still being decided one gated step at a
+time. This repository will grow into the book (tutorials, examples,
+explainers); for now it is this page.
+
+## The idea in two pictures
+
+Every dataset sits somewhere on one ladder, from a bare array to a table of
+features, according to how its positions are stored. wxylib models the
+ladder as one type rather than separate "raster", "multidimensional" and
+"vector" modes.
+
+![The R0 to R6 raster-vector spectrum, with R1 warped today, R0 to R3' modelled, R4 to R6 planned](img/spectrum.svg)
+
+Work is split into planning, reading and computing. A warp first plans
+which part of the source the target needs, then fetches only those chunks,
+then resamples. Any source that can present itself as a Collection of
+chunks (GeoTIFF, Zarr, or virtual Zarr pointing into other files) goes
+through the same pipeline.
+
+![Pipeline: GeoTIFF, Zarr and virtual Zarr sources become a Collection, then plan, fetch and warp, written as GeoZarr](img/pipeline.svg)
+
+## What works today
+
+All in [wxylib/core](https://github.com/wxylib/core):
+
+| Crate | What it does |
+|-------|--------------|
+| `wxy-domain` | The data model: dims, domains, mappings (R0 to R3'), frames, cell conventions. No I/O. |
+| `wxy-source` | Chunk sources: plan, fetch, decode, with chunking in index space. |
+| `wxy-tiff` | GeoTIFF and COG reads through async-tiff. |
+| `wxy-zarr` | Zarr v3 reads through zarrs, georeferenced by GeoZarr `spatial:`/`proj:` or CF coordinates; writes GeoZarr grids. |
+| `wxy-geozarr` | The GeoZarr `spatial:` and `proj:` conventions on their own, usable by any Zarr tool. |
+| `wxy-virtual` | Tiled TIFF byte ranges as Icechunk virtual references, read back as Zarr. |
+| `wxy-warp` | Warp onto a target grid through [rwarp](https://github.com/hypertidy/rwarp). |
+| `wxy-cli` | The `wxy warp` command: GeoTIFF or Zarr in, GeoZarr out. |
+
+Known gaps: only regular (R1, affine) grids warp so far; interpolated
+downsampling differs from GDAL until shared resampling kernels land (stage
+S5); `wxy-virtual` does not yet handle LZW or predictors; CRS work uses the
+pure-Rust proj4rs backend (EPSG codes and proj strings, no datum grids).
+No Python, R or browser packages exist yet.
+
+## What the tests check
+
+The tests use GDAL as an oracle. Small synthetic files and GDAL's output for
+them live in [wxylib/fixtures](https://github.com/wxylib/fixtures), made by
+scripts there with GDAL (through rasterio) and zarr-python.
+
+- **Reads** (`wxy-tiff`, `wxy-zarr`, `wxy-virtual`): every window must match
+  what GDAL reads, byte for byte, across five GeoTIFFs (int16, uint8,
+  uint16, float32; DEFLATE, ZSTD, LZW with predictor; COG and plain; pixel
+  and band interleaved; BigTIFF), and three of them converted to Zarr.
+- **Warps** (`wxy-warp`, `wxy-cli`): three source/target pairs (global to
+  Antarctic polar stereographic, polar to lon/lat, UTM to lon/lat) with
+  nearest, bilinear and cubic, compared with what GDAL's warper writes.
+  Nearest is identical everywhere.
+- **Model** (`wxy-domain`, `wxy-geozarr`): unit tests, including real-world
+  grid cases from regular-in-what (a float32 GHRSST axis, AVISO's Mercator
+  latitude, NSIDC polar stereographic).
+
+CI runs `cargo test --workspace` against the fixtures on every push and pull
+request to core.
+
+## Try it
+
+```sh
+git clone https://github.com/wxylib/core
+git clone https://github.com/wxylib/fixtures
+cd core
+cargo test --workspace
+cargo run -p wxy-cli -- warp ../fixtures/cog/world-int16-deflate.tif out.zarr \
+  --crs EPSG:3031 --extent -4e6 -4e6 4e6 4e6 --size 145 145
+```
+
+The tests find the fixtures at `../fixtures` (or `WXY_FIXTURES`) and skip
+when they are missing.
+
+## Getting involved
+
+- **Read the design first.** [wxylib/design](https://github.com/wxylib/design)
+  holds the module survey, the data model, the architecture and staged
+  roadmap, and a survey of related work. Each step ends in a gate, so the
+  open questions are written down there.
+- **Open an issue** on the repository it concerns: a bug or a GDAL mismatch
+  in core, a missing case in fixtures, a design question in design.
+- **Contribute a fixture.** A small file plus the GDAL output it should
+  produce is the most useful way to pin a behaviour down.
+- **Prefer upstream.** If a fix belongs in async-tiff, zarrs, Icechunk,
+  rwarp or the GeoZarr conventions, it goes there; wxylib keeps only what
+  has no other home.
+
+| Repository | Holds |
+|------------|-------|
+| [design](https://github.com/wxylib/design) | Design documents, roadmap and decisions |
+| [core](https://github.com/wxylib/core) | The Cargo workspace |
+| [fixtures](https://github.com/wxylib/fixtures) | Test files and GDAL oracle outputs |
+| [docs](https://github.com/wxylib/docs) | This page, and later the book |
+| [py](https://github.com/wxylib/py), [r](https://github.com/wxylib/r), [web](https://github.com/wxylib/web) | Placeholders for Python and R bindings and a browser app |
 
 License: MIT OR Apache-2.0.
