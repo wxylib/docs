@@ -46,8 +46,9 @@ All in [wxylib/core](https://github.com/wxylib/core):
 Known gaps: only regular (R1, affine) grids warp so far; interpolated
 downsampling differs from GDAL until shared resampling kernels land (stage
 S5); `wxy-virtual` does not yet handle LZW or predictors; CRS work uses the
-pure-Rust proj4rs backend (EPSG codes and proj strings, no datum grids).
-No Python, R or browser packages exist yet.
+pure-Rust proj4rs backend (EPSG codes, no datum grids; see
+[CRS input](crs-input.md) for which strings work where, and how they map to
+Rust Geodesy pipelines). No Python, R or browser packages exist yet.
 
 ## What the tests check
 
