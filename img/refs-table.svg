@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="350" viewBox="0 0 880 350" font-family="Helvetica, Arial, sans-serif">
+<rect width="880" height="350" rx="8" fill="#ffffff"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+<text x="20" y="26" font-size="16" font-weight="bold" fill="#222">A byte-reference table as a wxy-virtual source</text>
+<rect x="20" y="60" width="180" height="58" rx="6" fill="#eeeeee"/>
+<text x="110.0" y="86.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">netCDF4 files</text>
+<text x="110.0" y="104.0" font-size="11" text-anchor="middle" fill="#222">30 daily OISST, NOAA bucket</text>
+<rect x="20" y="190" width="180" height="58" rx="6" fill="#eeeeee"/>
+<text x="110.0" y="216.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">mosaic VRT</text>
+<text x="110.0" y="234.0" font-size="11" text-anchor="middle" fill="#222">gdal mdim mosaic</text>
+<path d="M110 118 L110 188" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="235" y="48" width="230" height="250" rx="8" fill="none" stroke="#3f6fa8" stroke-width="1.5"/>
+<text x="350" y="68" font-size="12" font-weight="bold" text-anchor="middle" fill="#3f6fa8">mdim-refs/0.2 table (SQLite)</text>
+<rect x="250" y="78" width="200" height="58" rx="6" fill="#2f7d4f"/>
+<text x="350.0" y="104.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">1 physical</text>
+<text x="350.0" y="122.0" font-size="11" text-anchor="middle" fill="#ffffff">byte ranges per source (GDAL)</text>
+<rect x="250" y="150" width="200" height="58" rx="6" fill="#2f7d4f"/>
+<text x="350.0" y="176.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">2 plan</text>
+<text x="350.0" y="194.0" font-size="11" text-anchor="middle" fill="#ffffff">placements: slabs from the VRT</text>
+<rect x="250" y="222" width="200" height="58" rx="6" fill="#3f6fa8"/>
+<text x="350.0" y="248.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">3 view</text>
+<text x="350.0" y="266.0" font-size="11" text-anchor="middle" fill="#ffffff">refs_&lt;array&gt;: global chunk index</text>
+<path d="M200 89 L248 107" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M200 219 L248 179" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M350 136 L350 148" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M350 208 L350 220" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="118" y="158" font-size="11" fill="#555">mosaic</text>
+<rect x="500" y="222" width="170" height="58" rx="6" fill="#eeeeee"/>
+<text x="585.0" y="248.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">Parquet + arrays.json</text>
+<text x="585.0" y="266.0" font-size="11" text-anchor="middle" fill="#222">the exported view</text>
+<path d="M450 251 L498 251" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="500" y="130" width="170" height="58" rx="6" fill="#dbe8f6"/>
+<text x="585.0" y="156.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1b2f45">Icechunk</text>
+<text x="585.0" y="174.0" font-size="11" text-anchor="middle" fill="#1b2f45">virtual chunk references</text>
+<path d="M585 222 L585 190" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="578" y="203" font-size="11" text-anchor="end" fill="#555">from_refs_table,</text>
+<text x="578" y="216" font-size="11" text-anchor="end" fill="#555">write_icechunk</text>
+<rect x="705" y="130" width="160" height="58" rx="6" fill="#eeeeee"/>
+<text x="785.0" y="156.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#222">zarrs / wxy-zarr</text>
+<text x="785.0" y="174.0" font-size="11" text-anchor="middle" fill="#222">read as Zarr v3</text>
+<path d="M670 159 L703 159" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M785 130 L785 42 L110 42 L110 58" stroke="#555" stroke-width="1.5" stroke-dasharray="5 4" fill="none" marker-end="url(#a)"/>
+<text x="675" y="60" font-size="11" text-anchor="middle" fill="#555">chunk bytes read straight from the files</text>
+<text x="675" y="74" font-size="11" text-anchor="middle" fill="#555">(HTTPS byte ranges)</text>
+<text x="440" y="330" font-size="11" text-anchor="middle" fill="#555">GDAL is the scanner for now. No copy of the data and no format of our own: the table says where each chunk is, Icechunk stores that, zarrs decodes it.</text>
+</svg>
