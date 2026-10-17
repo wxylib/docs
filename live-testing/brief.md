@@ -5,15 +5,16 @@ and the R and Python spikes, then running them on real data and comparing
 each result with GDAL. Every run says what to expect. Anything that differs
 from the expectation is worth reporting back (section 4).
 
-Status as of 2026-10-17: core main has stage S5's kernel scaling. Warping
+Status as of 2026-10-17: core main has stage S5's kernel scaling and overview selection. Warping
 matches GDAL's warper cell for cell with nearest, bilinear and cubic, at any
 ratio of target to source resolution, on every fixture case.
 
-One flag on the gdalwarp side matters: when the target is coarser than the
-source, gdalwarp reads an overview if the file has one (`-ovr AUTO`, its
-default). `wxy` doesn't choose overviews yet (that's the next piece of S5),
-so every gdalwarp command below passes `-ovr NONE`. Without it, expect
-differences wherever gdalwarp picked an overview.
+Overviews: when the target is coarser than the source, gdalwarp reads an
+overview if the file has one (`-ovr AUTO`, its default). `wxy warp` now
+chooses the same level by the same rule (`--overview auto`, its default),
+so the commands below leave both at their defaults. To compare without
+overviews, pass `-ovr NONE` to gdalwarp and `--overview none` to wxy; to
+force a level, `-ovr 1` and `--overview 1`.
 
 The fixtures were checked against GDAL's library warper one band at a time
 (rasterio's `reproject`), which is what `wxy` follows. The gdalwarp command
@@ -88,7 +89,7 @@ about its own resolution. Replace the bounds and size to suit.
 wxy warp in.tif out.zarr --crs EPSG:4326 \
   --extent 147.0 -43.44 147.036 -43.424 --size 290 180 -r cubic
 gdalwarp -t_srs EPSG:4326 -te 147.0 -43.44 147.036 -43.424 -ts 290 180 \
-  -r cubic -et 0.125 -ovr NONE in.tif ref.tif
+  -r cubic -et 0.125 in.tif ref.tif
 python compare.py out.zarr ref.tif
 ```
 
@@ -107,7 +108,7 @@ extract), to EPSG:3031.
 ```sh
 wxy warp world.tif out.zarr --crs EPSG:3031 \
   --extent -4e6 -4e6 4e6 4e6 --size 400 400 --no-wrap
-gdalwarp -t_srs EPSG:3031 -te -4e6 -4e6 4e6 4e6 -ts 400 400 -r near -ovr NONE \
+gdalwarp -t_srs EPSG:3031 -te -4e6 -4e6 4e6 4e6 -ts 400 400 -r near \
   world.tif ref.tif
 python compare.py out.zarr ref.tif
 ```
@@ -136,7 +137,7 @@ cargo run --release -p wxy-virtual --example oisst_refs -- \
   nearest, raw little-endian int16). Compare it with:
 
 ```sh
-gdalwarp -t_srs EPSG:3031 -te -4e6 -4e6 4e6 4e6 -ts 400 400 -r near -ot Int16 -ovr NONE \
+gdalwarp -t_srs EPSG:3031 -te -4e6 -4e6 4e6 4e6 -ts 400 400 -r near -ot Int16 \
   'NETCDF:"/vsicurl/https://noaa-cdr-sea-surface-temp-optimum-interpolation-pds.s3.amazonaws.com/data/v2.1/avhrr/198109/oisst-avhrr-v02r01.19810930.nc":sst' \
   -of ENVI ref.bin
 ```
