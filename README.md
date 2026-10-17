@@ -75,6 +75,9 @@ and how the two are checked against each other.
 - [Curvilinear grids](explainers/geoloc.md): GDAL's geolocation-array
   transformer, the backmap and the search that turns a position back
   into a cell of a swath.
+- [Values at points](explainers/points.md): gdallocationinfo's cell
+  and InterpolateAtPoint's kernels, how they differ from a warp's, and
+  reads planned so each chunk is fetched once.
 
 ## What the tests check
 
