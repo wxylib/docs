@@ -5,8 +5,9 @@ and the R and Python spikes, then running them on real data and comparing
 each result with GDAL. Every run says what to expect. Anything that differs
 from the expectation is worth reporting back (section 4).
 
-Status as of 2026-10-17: core main has stage S5's kernel scaling and overview selection. Warping
-matches GDAL's warper cell for cell with nearest, bilinear and cubic, at any
+Status as of 2026-10-17: core main has stage S5's kernel scaling and
+overview selection, and stage S4b (sources with more dims than y and x,
+streamed slice by slice). Warping matches GDAL's warper cell for cell with nearest, bilinear and cubic, at any
 ratio of target to source resolution, on every fixture case.
 
 Overviews: when the target is coarser than the source, gdalwarp reads an
@@ -151,6 +152,32 @@ print((a != b).sum(), "of", a.size)
 Expect 0. This is a 0..360 source, so both tools wrap. If GDAL flips the
 south-up rows differently, the count will be near the full size; report
 that and we'll look into it.
+
+### 3.3b A whole month, streamed (stage S4b)
+
+`wxy warp` now takes any number of dims before y and x and streams them
+through one plan, a batch of source chunks at a time. A month of OISST as
+one local Zarr store (time x zlev x lat x lon) is a good real test:
+
+```python
+import xarray as xr
+url = "https://noaa-cdr-sea-surface-temp-optimum-interpolation-pds.s3.amazonaws.com/data/v2.1/avhrr/198109/oisst-avhrr-v02r01.198109{:02d}.nc"
+# packed int16, as gdalwarp reads it
+ds = xr.open_mfdataset([url.format(d) + "#mode=bytes" for d in range(1, 31)],
+                       mask_and_scale=False)
+ds[["sst"]].chunk({"time": 5}).to_zarr("oisst-198109.zarr", zarr_format=3, mode="w")
+```
+
+```sh
+wxy warp oisst-198109.zarr month-3031.zarr --source-array /sst \
+  --crs EPSG:3031 --extent -4e6 -4e6 4e6 4e6 --size 400 400 -r bilinear
+```
+
+- Expect a (30, 1, 400, 400) output with dims `time, zlev, y, x`, written
+  batch by batch (memory stays near one batch, not the month).
+- Any one day should match gdalwarp of that day's file as in 3.3, with
+  `-r bilinear` on both sides. If the store reads but will not warp,
+  report the error: xarray's coordinate encoding is the likeliest gap.
 
 ### 3.4 Zarr in, Zarr out
 
