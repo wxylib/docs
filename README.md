@@ -62,6 +62,29 @@ early spikes that warp in-memory arrays only; nothing is published.
   `wxy zonal` against GDAL's dense rasterize and exactextract, with
   timings and peak memory.
 
+## Explainers
+
+How each GDAL mechanism that wxylib ports works, in GDAL and in wxylib,
+and how the two are checked against each other.
+
+- [How the warper works](explainers/warper.md): chunks, source windows
+  and kernel scale, and why they change the values a warp writes.
+- [Resampling kernels](explainers/kernels.md): bilinear and cubic
+  weights, how they stretch for a coarser target, edges, nodata and the
+  arithmetic order that decides the last digit.
+- [Curvilinear grids](explainers/geoloc.md): GDAL's geolocation-array
+  transformer, the backmap and the search that turns a position back
+  into a cell of a swath.
+- [Values at points](explainers/points.md): gdallocationinfo's cell
+  and InterpolateAtPoint's kernels, how they differ from a warp's, and
+  reads planned so each chunk is fetched once.
+- [Polygons to cells](explainers/rasterize.md): GDAL's rasterizer by
+  cell centre and ALL_TOUCHED, what happens to a polygon before the burn,
+  and coverage fractions.
+- [Overview selection](explainers/overviews.md): gdalwarp's `-ovr AUTO`
+  rule for which resolution level a warp reads, checked against gdalwarp
+  itself.
+
 ## What the tests check
 
 The tests use GDAL as an oracle. Small synthetic files and GDAL's output for
