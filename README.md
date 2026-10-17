@@ -56,6 +56,12 @@ no datum grids; see [CRS input](crs-input.md) for which strings work where,
 and how they map to Rust Geodesy pipelines). The Python and R packages are
 early spikes that warp in-memory arrays only; nothing is published.
 
+## Examples
+
+- [Zonal statistics by lazy rasterization](examples/zonal/README.md):
+  `wxy zonal` against GDAL's dense rasterize and exactextract, with
+  timings and peak memory.
+
 ## What the tests check
 
 The tests use GDAL as an oracle. Small synthetic files and GDAL's output for
