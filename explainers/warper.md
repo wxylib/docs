@@ -117,8 +117,8 @@ Two things are organised differently, without changing the values:
   dimensions (time, depth, band) are then warped slice by slice under the
   same plan, so a 4D store streams through without being loaded.
 - **The kernels have no I/O and no transforms.** `wxy-resample` takes a
-  window of cells and a position in it, and nothing else, so the same
-  kernels serve point extraction too.
+  window of cells and a position in it, and nothing else; the chunk loop
+  in `wxy-warp` supplies both (see [the kernels](kernels.md)).
 
 And a few things differ on purpose, each with a switch:
 

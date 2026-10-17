@@ -69,6 +69,9 @@ and how the two are checked against each other.
 
 - [How the warper works](explainers/warper.md): chunks, source windows
   and kernel scale, and why they change the values a warp writes.
+- [Resampling kernels](explainers/kernels.md): bilinear and cubic
+  weights, how they stretch for a coarser target, edges, nodata and the
+  arithmetic order that decides the last digit.
 
 ## What the tests check
 
