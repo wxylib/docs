@@ -7,8 +7,9 @@ from the expectation is worth reporting back (section 4).
 
 Status as of 2026-10-17: core main has stage S5's kernel scaling and
 overview selection, and stage S4b (sources with more dims than y and x,
-streamed slice by slice). Warping matches GDAL's warper cell for cell with nearest, bilinear and cubic, at any
-ratio of target to source resolution, on every fixture case.
+streamed slice by slice). Warping matches GDAL's warper cell for cell with
+nearest, bilinear and cubic, at any ratio of target to source resolution,
+on every fixture case.
 
 Overviews: when the target is coarser than the source, gdalwarp reads an
 overview if the file has one (`-ovr AUTO`, its default). `wxy warp` now
