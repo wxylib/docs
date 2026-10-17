@@ -76,13 +76,13 @@ records the level chosen and GDAL's warp from that level.
 `choose_overview` to pick the same level and the warp to give the same
 values, cell for cell, for nearest, bilinear and cubic.
 
-The fixture script chooses the level with its own port of gdalwarp's rule,
-since the cloud environment has no `gdalwarp` command. For this page the
-choice was also checked against gdalwarp itself: `GDALWarp`, the library
-function behind the command, called through ctypes in the libgdal that
-rasterio bundles, with `-ovr` left at its default, reading the level it
-selects from its debug log. [overviews-figure.py](overviews-figure.py)
-does this for 78 global lon/lat targets from the world fixture (the
-figure). A wider sweep of 41 targets over three fixtures (the world to
-lon/lat and to polar stereographic, UTM to lon/lat, polar stereographic
-to lon/lat) agreed in every case too.
+The fixture script chooses the level with its own port of gdalwarp's
+rule. For this page the choice was also checked against GDAL itself:
+GDAL's new `gdal raster reproject` (run through osgeo.gdal's `gdal.Run`,
+GDAL 3.12), whose overview choice is gdalwarp's `-ovr AUTO`, reading the
+level it selects from its debug log.
+[overviews-figure.py](overviews-figure.py) does this for 78 global
+lon/lat targets from the world fixture (the figure). A wider sweep of 41
+targets over three fixtures (the world to lon/lat and to polar
+stereographic, UTM to lon/lat, polar stereographic to lon/lat), run
+through gdalwarp's library function, agreed in every case too.

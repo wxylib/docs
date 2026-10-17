@@ -4,13 +4,14 @@ target is coarser than the source.
 Top: GDAL's bilinear and cubic weights at 1:1 and stretched for a target
 four times coarser. Bottom: a zone plate (rings that get finer away from
 the centre) warped to a grid about ten times coarser with bilinear, by
-GDAL's warper (through rasterio), by `wxy warp` (GDAL's chunked warp,
-stretched kernel) and by `wxy warp --plain` (1:1 kernel).
+GDAL's warper (`gdal raster reproject`, through osgeo.gdal), by
+`wxy warp` (GDAL's chunked warp, stretched kernel) and by
+`wxy warp --plain` (1:1 kernel).
 
     cargo build --release -p wxy-cli    # in wxylib/core
     python kernels-figure.py ../../core/target/release/wxy
 
-Needs rasterio, numpy, matplotlib and zarr.
+Needs GDAL's Python bindings (osgeo), numpy, matplotlib and zarr.
 """
 
 import os
@@ -21,10 +22,10 @@ import tempfile
 
 import matplotlib.pyplot as plt
 import numpy as np
-import rasterio
 import zarr
-from rasterio.transform import from_bounds
-from rasterio.warp import Resampling, reproject
+from osgeo import gdal
+
+gdal.UseExceptions()
 
 WXY = sys.argv[1]
 INK, MUTED = "#0b0b0b", "#52514e"
@@ -44,16 +45,19 @@ DW = DH = 160
 tmp = tempfile.mkdtemp()
 try:
     src_path = os.path.join(tmp, "plate.tif")
-    with rasterio.open(src_path, "w", driver="GTiff", width=N, height=N,
-                       count=1, dtype="float32", crs="EPSG:4326",
-                       transform=from_bounds(*SRC_BOUNDS, N, N),
-                       tiled=True) as d:
-        d.write(plate, 1)
+    d = gdal.GetDriverByName("GTiff").Create(src_path, N, N, 1, gdal.GDT_Float32,
+                                             options=["TILED=YES"])
+    x0, y0, x1, y1 = SRC_BOUNDS
+    d.SetGeoTransform((x0, (x1 - x0) / N, 0.0, y1, 0.0, -(y1 - y0) / N))
+    d.SetProjection("EPSG:4326")
+    d.GetRasterBand(1).WriteArray(plate)
+    d = None
 
-    gdal = np.zeros((DH, DW), "float32")
-    reproject(plate, gdal, src_transform=from_bounds(*SRC_BOUNDS, N, N),
-              src_crs="EPSG:4326", dst_transform=from_bounds(*DST_BOUNDS, DW, DH),
-              dst_crs=DST_CRS, resampling=Resampling.bilinear)
+    gdal_out = gdal.Run("raster", "reproject", input=src_path, output="",
+                        output_format="MEM", dst_crs=DST_CRS,
+                        bbox=list(DST_BOUNDS), size=[DW, DH],
+                        resampling="bilinear", num_threads=1)
+    gdal_vals = gdal_out.Output().ReadAsArray()
 
     def wxy(*extra):
         out = os.path.join(tmp, "out.zarr")
@@ -69,10 +73,10 @@ try:
 finally:
     shutil.rmtree(tmp)
 
-d_chunked = int((chunked != gdal).sum())
-d_plain = int((plain != gdal).sum())
-print(f"wxy warp vs GDAL: {d_chunked} of {gdal.size} cells differ")
-print(f"wxy warp --plain vs GDAL: {d_plain} of {gdal.size} cells differ")
+d_chunked = int((chunked != gdal_vals).sum())
+d_plain = int((plain != gdal_vals).sum())
+print(f"wxy warp vs GDAL: {d_chunked} of {gdal_vals.size} cells differ")
+print(f"wxy warp --plain vs GDAL: {d_plain} of {gdal_vals.size} cells differ")
 
 
 def bilinear(x):
@@ -116,7 +120,7 @@ for k, (name, f, r) in enumerate([("bilinear", bilinear, 1),
 
 panels = [
     (plate, "Source: 2000 x 2000 zone plate"),
-    (gdal, "GDAL bilinear, 160 x 160"),
+    (gdal_vals, "GDAL bilinear, 160 x 160"),
     (chunked, f"wxy warp: {d_chunked} cells differ"),
     (plain, f"wxy warp --plain: {d_plain} differ"),
 ]

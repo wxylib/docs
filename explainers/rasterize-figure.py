@@ -1,7 +1,7 @@
 """Figure for explainers/rasterize.md: which cells a polygon gets.
 
 A star-shaped polygon with a hole on a 16 x 12 grid, burned by GDAL's
-rasterizer (through rasterio.features.rasterize) by cell centre and with
+rasterizer (`gdal vector rasterize`, through osgeo.gdal) by cell centre and with
 ALL_TOUCHED, and the fraction of each cell it covers (computed here with
 shapely; wxylib's --coverage gets it from controlledburn). The centre
 panel also shows the scanlines at row centres and where the polygon's
@@ -11,11 +11,14 @@ edges cross them.
 """
 
 import matplotlib.pyplot as plt
+import json
+
 import numpy as np
 import shapely
-from affine import Affine
 from matplotlib.colors import ListedColormap
-from rasterio.features import rasterize
+from osgeo import gdal
+
+gdal.UseExceptions()
 
 W, H = 16, 12
 rng = np.random.default_rng(7)
@@ -26,11 +29,24 @@ ext = list(zip(8 + r * np.cos(a), 6 + r * np.sin(a) * 0.95))
 b = np.arange(6) * 2 * np.pi / 6 + 0.3
 hole = list(zip(8.4 + 1.3 * np.cos(b), 6.2 + 1.3 * np.sin(b)))
 poly = shapely.Polygon(ext, [hole])
-# index space: x = column, y = row (down), one unit per cell
-geom = shapely.geometry.mapping(poly)
-centre = rasterize([geom], out_shape=(H, W), transform=Affine.identity())
-touched = rasterize([geom], out_shape=(H, W), transform=Affine.identity(),
-                    all_touched=True)
+# index space: x = column, y = row (down), one unit per cell. GDAL's grid
+# is north up, so the polygon goes to it with y flipped: y' = H - y.
+flipped = shapely.transform(poly, lambda c: np.column_stack([c[:, 0], H - c[:, 1]]))
+gdal.FileFromMemBuffer("/vsimem/poly.geojson", json.dumps(
+    {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "properties": {},
+         "geometry": shapely.geometry.mapping(flipped)}]}))
+
+
+def burn(all_touched):
+    out = gdal.Run("vector", "rasterize", input="/vsimem/poly.geojson",
+                   output="", output_format="MEM", burn=[1], init=[0],
+                   extent=[0, 0, W, H], size=[W, H], output_data_type="Byte",
+                   all_touched=all_touched)
+    return out.Output().ReadAsArray()
+
+
+centre, touched = burn(False), burn(True)
 cover = np.zeros((H, W))
 for row in range(H):
     for col in range(W):

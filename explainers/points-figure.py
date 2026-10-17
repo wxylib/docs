@@ -12,22 +12,22 @@ to the edge, a cubic kernel whose outer column repeats the edge cells.
     python points-figure.py ../../fixtures
 """
 
-import json
 import os
 import sys
 
 import matplotlib.patches as mp
 import matplotlib.pyplot as plt
 import numpy as np
-import rasterio
+from osgeo import gdal
 
 ROOT = sys.argv[1]
 CASE = "world-int16-deflate-4326"
 TILE = 128
 
-with rasterio.open(os.path.join(ROOT, "cog/world-int16-deflate.tif")) as s:
-    a = s.read(1)
-    assert s.block_shapes[0] == (TILE, TILE)
+gdal.UseExceptions()
+src = gdal.Open(os.path.join(ROOT, "cog/world-int16-deflate.tif"))
+assert src.GetRasterBand(1).GetBlockSize() == [TILE, TILE]
+a = src.ReadAsArray()
 h, w = a.shape
 px = np.fromfile(os.path.join(ROOT, f"points/{CASE}-pixel.bin"), "<f8")
 py = np.fromfile(os.path.join(ROOT, f"points/{CASE}-line.bin"), "<f8")

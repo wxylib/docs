@@ -2,47 +2,36 @@
 the source window each chunk reads.
 
 Warps the world fixture (wxylib/fixtures cog/world-int16-deflate.tif) to a
-2000 x 2000 south polar stereographic grid with GDAL's warper (through
-rasterio) at a 1 MB memory limit, so that the chunking is visible at a
-small size, and reads GDAL's chunk list from its debug log. wxy computes
-the same list (see the explainer for how that was checked).
+2000 x 2000 south polar stereographic grid with GDAL's warper at a 1 MB
+memory limit (gdalwarp -wm 1, through osgeo.gdal; the new `gdal raster
+reproject` has no memory limit option), so that the chunking is visible
+at a small size, and reads GDAL's chunk list from its debug log.
+`wxy warp ... --wm 1 --dry-run` prints the same list.
 
     python warper-chunks.py ../../fixtures/cog/world-int16-deflate.tif
+
+Needs GDAL's Python bindings (osgeo), numpy and matplotlib.
 """
 
-import logging
 import re
 import sys
 
 import matplotlib.patches as mp
 import matplotlib.pyplot as plt
-import numpy as np
-import rasterio
-from rasterio.transform import from_bounds
-from rasterio.warp import Resampling, reproject
+from osgeo import gdal
 
+gdal.UseExceptions()
 SIZE = 2000
 EXTENT = (-8e6, -8e6, 8e6, 8e6)
 
 logs = []
-
-
-class Grab(logging.Handler):
-    def emit(self, record):
-        logs.append(record.getMessage())
-
-
-log = logging.getLogger("rasterio")
-log.setLevel(logging.DEBUG)
-log.addHandler(Grab())
-
-with rasterio.Env(CPL_DEBUG="ON"), rasterio.open(sys.argv[1]) as src:
-    a = src.read(1)
-    dst = np.zeros((SIZE, SIZE), a.dtype)
-    reproject(a, dst, src_transform=src.transform, src_crs=src.crs,
-              dst_transform=from_bounds(*EXTENT, SIZE, SIZE),
-              dst_crs="EPSG:3031", resampling=Resampling.nearest,
-              warp_mem_limit=1)
+gdal.PushErrorHandler(lambda cls, no, msg: logs.append(msg))
+gdal.SetConfigOption("CPL_DEBUG", "ON")
+a = gdal.Open(sys.argv[1]).ReadAsArray()
+dst = gdal.Warp("", sys.argv[1], format="MEM", dstSRS="EPSG:3031",
+                outputBounds=EXTENT, width=SIZE, height=SIZE,
+                resampleAlg="near", warpMemoryLimit=1).ReadAsArray()
+gdal.SetConfigOption("CPL_DEBUG", None)
 
 pat = re.compile(r"Src=(\d+),(\d+),(\d+)x(\d+) Dst=(\d+),(\d+),(\d+)x(\d+)")
 chunks = [tuple(map(int, m.groups())) for m in map(pat.search, logs) if m]

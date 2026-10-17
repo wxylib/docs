@@ -71,8 +71,8 @@ see every longitude, so their windows take the whole width, as does chunk
 
 ![GDAL's 13 chunks of a polar stereographic target and the lon/lat source window each reads](img/warper-chunks.png)
 
-The chunk list is GDAL's, read from its debug log by
-[warper-chunks.py](warper-chunks.py). `wxy warp ... --wm 1 --dry-run`
+The chunk list is GDAL's (gdalwarp `-wm 1`, through osgeo.gdal), read from
+its debug log by [warper-chunks.py](warper-chunks.py). `wxy warp ... --wm 1 --dry-run`
 prints wxylib's plan (`warp_chunks`), which has the same 13 chunks and
 windows, and the warp itself gives GDAL's values in all 4,000,000 cells
 for nearest, bilinear and cubic.
@@ -160,7 +160,8 @@ Larger splits were checked for this page:
   chunks each.
 - **The values.** [warper-check.py](warper-check.py) warps the polar
   fixture to a 3000 x 600 lon/lat grid, which GDAL splits into 44 chunks
-  at its default settings, with `wxy warp` and with GDAL. All 1,800,000
+  at its default settings, with `wxy warp` and with GDAL's
+`gdal raster reproject`. All 1,800,000
   cells are identical for nearest, bilinear and cubic.
 
 ```
