@@ -78,6 +78,9 @@ and how the two are checked against each other.
 - [Values at points](explainers/points.md): gdallocationinfo's cell
   and InterpolateAtPoint's kernels, how they differ from a warp's, and
   reads planned so each chunk is fetched once.
+- [Polygons to cells](explainers/rasterize.md): GDAL's rasterizer by
+  cell centre and ALL_TOUCHED, what happens to a polygon before the burn,
+  and coverage fractions.
 
 ## What the tests check
 

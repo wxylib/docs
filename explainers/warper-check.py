@@ -1,8 +1,8 @@
 """Check for explainers/warper.md: a warp that GDAL splits into many chunks
 gives GDAL's numbers from `wxy warp`, cell for cell.
 
-The fixture oracle cases each run as one chunk, so this check covers the
-multi-chunk path: the polar stereographic fixture to a 3000 x 600 lon/lat
+The fixture oracle cases split into at most 16 chunks; this check takes a
+larger split: the polar stereographic fixture to a 3000 x 600 lon/lat
 grid, which GDAL's warper (through rasterio) splits into 44 chunks at its
 default 64 MB memory limit because the source windows of the larger
 chunks are mostly empty.

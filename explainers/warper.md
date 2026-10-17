@@ -72,8 +72,10 @@ see every longitude, so their windows take the whole width, as does chunk
 ![GDAL's 13 chunks of a polar stereographic target and the lon/lat source window each reads](img/warper-chunks.png)
 
 The chunk list is GDAL's, read from its debug log by
-[warper-chunks.py](warper-chunks.py). wxylib computes the same 13 chunks
-and windows.
+[warper-chunks.py](warper-chunks.py). `wxy warp ... --wm 1 --dry-run`
+prints wxylib's plan (`warp_chunks`), which has the same 13 chunks and
+windows, and the warp itself gives GDAL's values in all 4,000,000 cells
+for nearest, bilinear and cubic.
 
 ## Why the chunks matter to the values
 
@@ -138,20 +140,22 @@ destination alpha, cutlines, and source masks other than nodata.
 GDAL is the oracle. [wxylib/fixtures](https://github.com/wxylib/fixtures)
 holds small source files and what GDAL's warper writes for them
 (`scripts/make_warp_fixtures.py`, through rasterio with the approximate
-transformer at its default 0.125 pixel threshold). There are 12 source and
+transformer at its default 0.125 pixel threshold). There are 13 source and
 target pairs, each with nearest, bilinear and cubic: global to Antarctic
 polar stereographic, polar to lon/lat, a 0 to 360 source across its seam,
 a source with nodata, UTM to lon/lat at 1:1 and coarser, and targets that
-read from overviews. `cargo test -p wxy-warp` (`tests/gdal_oracle.rs`)
-warps each and compares with GDAL's output. The bar is identity: every
-cell, every case.
+read from overviews. Two of them split into chunks: `polar-to-4326-global`
+into 16, because most of its target misses the source (the fill ratio
+rule), and `world-to-3031-wm1` into 4, with the memory limit at 1 MB
+(`WarpOptions::memory_limit`, `wxy warp --wm`, gdalwarp's `-wm`).
+`cargo test -p wxy-warp` (`tests/gdal_oracle.rs`) warps each and compares
+with GDAL's output. The bar is identity: every cell, every case.
 
-Those cases each run as a single chunk. The multi-chunk path was checked
-for this page in two ways:
+Larger splits were checked for this page:
 
-- **The chunk list.** For five target grids (polar stereographic targets of
-  four extents from the world fixture, and the polar fixture to lon/lat;
-  nearest, bilinear and cubic) wxylib's chunks and windows, printed from `Planner::chunks`, were
+- **The chunk list.** For five target grids (polar stereographic targets
+  of four extents from the world fixture, and the polar fixture to
+  lon/lat; nearest, bilinear and cubic), wxylib's chunks and windows were
   the same as GDAL's debug log at a 1 MB memory limit, between 8 and 44
   chunks each.
 - **The values.** [warper-check.py](warper-check.py) warps the polar
