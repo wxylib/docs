@@ -72,6 +72,9 @@ and how the two are checked against each other.
 - [Resampling kernels](explainers/kernels.md): bilinear and cubic
   weights, how they stretch for a coarser target, edges, nodata and the
   arithmetic order that decides the last digit.
+- [Curvilinear grids](explainers/geoloc.md): GDAL's geolocation-array
+  transformer, the backmap and the search that turns a position back
+  into a cell of a swath.
 
 ## What the tests check
 
