@@ -30,6 +30,10 @@ through the same pipeline.
 
 ## What works today
 
+New here? The [OISST walk-through](oisst-virtual.md) reads a month of real
+sea surface temperature from NOAA's bucket as virtual Zarr, checks it
+against GDAL, and warps a day to the Antarctic.
+
 All in [wxylib/core](https://github.com/wxylib/core):
 
 | Crate | What it does |
@@ -39,13 +43,14 @@ All in [wxylib/core](https://github.com/wxylib/core):
 | `wxy-tiff` | GeoTIFF and COG reads through async-tiff. |
 | `wxy-zarr` | Zarr v3 reads through zarrs, georeferenced by GeoZarr `spatial:`/`proj:` or CF coordinates; writes GeoZarr grids. |
 | `wxy-geozarr` | The GeoZarr `spatial:` and `proj:` conventions on their own, usable by any Zarr tool. |
-| `wxy-virtual` | Tiled TIFF byte ranges as Icechunk virtual references, read back as Zarr. |
+| `wxy-virtual` | Virtual Zarr: tiled TIFF byte ranges, or a byte-reference table (mdim-refs, such as a netCDF archive scanned by GDAL), as Icechunk virtual references to local files or `https://` URLs, read back as Zarr. |
 | `wxy-warp` | Warp onto a target grid through [rwarp](https://github.com/hypertidy/rwarp). |
 | `wxy-cli` | The `wxy warp` command: GeoTIFF or Zarr in, GeoZarr out. |
 
 Known gaps: only regular (R1, affine) grids warp so far; interpolated
 downsampling differs from GDAL until shared resampling kernels land (stage
-S5); `wxy-virtual` does not yet handle LZW or predictors; CRS work uses the
+S5); `wxy-virtual` does not yet handle LZW or predictors, `s3://`
+references, or tables with several chunks per file; CRS work uses the
 pure-Rust proj4rs backend (EPSG codes, no datum grids; see
 [CRS input](crs-input.md) for which strings work where, and how they map to
 Rust Geodesy pipelines). No Python, R or browser packages exist yet.
@@ -59,7 +64,9 @@ scripts there with GDAL (through rasterio) and zarr-python.
 - **Reads** (`wxy-tiff`, `wxy-zarr`, `wxy-virtual`): every window must match
   what GDAL reads, byte for byte, across five GeoTIFFs (int16, uint8,
   uint16, float32; DEFLATE, ZSTD, LZW with predictor; COG and plain; pixel
-  and band interleaved; BigTIFF), and three of them converted to Zarr.
+  and band interleaved; BigTIFF), three of them converted to Zarr, and a
+  byte-reference table over three netCDF4 files (one chunk missing on
+  purpose, which must read as fill).
 - **Warps** (`wxy-warp`, `wxy-cli`): three source/target pairs (global to
   Antarctic polar stereographic, polar to lon/lat, UTM to lon/lat) with
   nearest, bilinear and cubic, compared with what GDAL's warper writes.
