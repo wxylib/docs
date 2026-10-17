@@ -62,6 +62,14 @@ early spikes that warp in-memory arrays only; nothing is published.
   `wxy zonal` against GDAL's dense rasterize and exactextract, with
   timings and peak memory.
 
+## Explainers
+
+How each GDAL mechanism that wxylib ports works, in GDAL and in wxylib,
+and how the two are checked against each other.
+
+- [How the warper works](explainers/warper.md): chunks, source windows
+  and kernel scale, and why they change the values a warp writes.
+
 ## What the tests check
 
 The tests use GDAL as an oracle. Small synthetic files and GDAL's output for
