@@ -56,6 +56,15 @@ no datum grids; see [CRS input](crs-input.md) for which strings work where,
 and how they map to Rust Geodesy pipelines). The Python and R packages are
 early spikes that warp in-memory arrays only; nothing is published.
 
+## Vignettes
+
+Questions people ask on forums and issue trackers, answered with a command
+or a live page: [maps of a COG in any projection in the
+browser](vignettes/browser/README.md), [a curvilinear grid with a time axis
+to a polar map](vignettes/curvilinear/README.md), and [values at points by
+nearest or interpolation](vignettes/points/README.md). See the
+[list](vignettes/README.md).
+
 ## Examples
 
 - [Zonal statistics by lazy rasterization](examples/zonal/README.md):
