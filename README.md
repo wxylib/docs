@@ -81,6 +81,9 @@ and how the two are checked against each other.
 - [Polygons to cells](explainers/rasterize.md): GDAL's rasterizer by
   cell centre and ALL_TOUCHED, what happens to a polygon before the burn,
   and coverage fractions.
+- [Overview selection](explainers/overviews.md): gdalwarp's `-ovr AUTO`
+  rule for which resolution level a warp reads, checked against gdalwarp
+  itself.
 
 ## What the tests check
 
