@@ -177,8 +177,27 @@ wxy warp oisst-198109.zarr month-3031.zarr --source-array /sst \
 - Expect a (30, 1, 400, 400) output with dims `time, zlev, y, x`, written
   batch by batch (memory stays near one batch, not the month).
 - Any one day should match gdalwarp of that day's file as in 3.3, with
-  `-r bilinear` on both sides. If the store reads but will not warp,
-  report the error: xarray's coordinate encoding is the likeliest gap.
+  `-r bilinear` on both sides. The fixture `cf/oisst-like.zarr` imitates
+  this layout (packed int16, float32 1D lat ascending, lon 0 to 360) and
+  matches GDAL in CI, so a failure here is something the imitation
+  misses: report the error and the store's `sst/zarr.json`.
+
+### 3.3c A curvilinear store (stage S5b)
+
+`wxy warp` takes CF 2D coordinates: lon and lat arrays beside the data
+(named in its `coordinates` attribute), placed by cell centres as GDAL's
+netCDF driver does, or by CF cell bounds with `--bounds`. Any swath or
+ocean-model grid written to Zarr by xarray will do, for example a NEMO or
+ROMS output subset:
+
+```sh
+wxy warp model.zarr model-3031.zarr --source-array /temp \
+  --crs EPSG:3031 --extent -4e6 -4e6 4e6 4e6 --size 400 400 -r bilinear
+```
+
+- Compare with `gdalwarp -geoloc` on the same variable read from the
+  original netCDF (`NETCDF:"file.nc":temp`), `-r bilinear -et 0.125`.
+- Leading dims (time, depth) stream as in 3.3b.
 
 ### 3.4 Zarr in, Zarr out
 
