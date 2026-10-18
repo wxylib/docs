@@ -35,6 +35,7 @@ are pulled in from wxylib/design at build time, so they have one copy.
 git clone https://github.com/wxylib/design   # into this directory, as design/
 git clone https://github.com/wxylib/core     # optional, as core/: live counts on the capability map
 python3 -m pip install pyyaml                # for capabilities/build.py
+python3 capabilities/build.py                # once, before the first render
 quarto preview
 ```
 
