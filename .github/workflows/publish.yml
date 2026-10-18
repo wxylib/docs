@@ -1,8 +1,9 @@
 # Render the Quarto site (this repository plus wxylib/design, checked out
-# into design/) and publish it to GitHub Pages from main. Pull requests
-# render too, so a broken page fails the check, and the rendered site is
-# attached to the run as an artifact. Needs Pages turned on with "GitHub
-# Actions" as the source (Settings, Pages).
+# into design/, and wxylib/core in core/ for the capability map's counts)
+# and publish it to GitHub Pages from main. Pull requests render too, so
+# a broken page (or a bad capabilities.yml) fails the check, and the
+# rendered site is attached to the run as an artifact. Needs Pages
+# turned on with "GitHub Actions" as the source (Settings, Pages).
 name: publish
 
 on:
@@ -27,6 +28,16 @@ jobs:
         with:
           repository: wxylib/design
           path: design
+      - uses: actions/checkout@v4
+        with:
+          repository: wxylib/core
+          path: core
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the capability map's one dependency
+        run: python -m pip install pyyaml
       - uses: quarto-dev/quarto-actions/setup@v2
       - name: Render
         run: quarto render

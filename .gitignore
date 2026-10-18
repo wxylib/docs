@@ -2,3 +2,9 @@
 /.quarto/
 # wxylib/design, checked out here by the publish workflow
 /design/
+# wxylib/core, checked out here by the publish workflow for the capability counts
+/core/
+# written by capabilities/build.py at render
+/capabilities/_generated.md
+
+**/*.quarto_ipynb

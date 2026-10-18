@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: _site
+  # Writes capabilities/_generated.md from capabilities/capabilities.yml.
+  pre-render: capabilities/build.py
   render:
     - index.qmd
     - start.qmd
@@ -21,8 +23,6 @@ project:
     - design/README.md
     - design/docs/*.md
     - design/specs/*.md
-  resources:
-    - capabilities/map.html
 
 website:
   title: "wxylib"
