@@ -28,7 +28,7 @@ project:
 website:
   title: "wxylib"
   description: "GDAL's modular ideas as small Rust crates, checked against GDAL."
-  site-url: https://wxylib.github.io/docs/
+  site-url: https://wxylib.org/docs/
   repo-url: https://github.com/wxylib/docs
   repo-actions: [edit, issue]
   search: true

@@ -8,15 +8,15 @@ Every view is a fresh warp: GDAL's chunked warp, kernels and overview
 choice, fetching only the COG tiles the view touches over HTTP range
 requests.
 
-- [A COG in any projection](https://wxylib.github.io/web/cog.html): drag to
+- [A COG in any projection](https://wxylib.org/web/cog.html): drag to
   pan, scroll to zoom, change the target CRS. Deep links take `?url=` and
   `?crs=`.
-- [Sentinel-2 on a web map](https://wxylib.github.io/web/s2.html): a STAC
+- [Sentinel-2 on a web map](https://wxylib.org/web/s2.html): a STAC
   search of the map view, and the chosen scene's raw band COGs warped onto
   the map's own grid. Deep links take `?from=` and `?to=` dates.
 
 ```{=html}
-<iframe class="demo" src="https://wxylib.github.io/web/" title="wxylib browser demos" loading="lazy"></iframe>
+<iframe class="demo" src="https://wxylib.org/web/" title="wxylib browser demos" loading="lazy"></iframe>
 ```
 
 See the [browser how-to](vignettes/browser/README.md) for what the demos
