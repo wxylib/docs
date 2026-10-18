@@ -1,0 +1,31 @@
+---
+title: "Reference"
+---
+
+Each language keeps its own native reference tool, published to its own
+address and linked from here, so it is generated from the code and cannot
+drift.
+
+| Surface | Reference | State |
+|---------|-----------|-------|
+| Rust crates | rustdoc (`cargo doc`), at wxylib.github.io/core | Not published yet; the crate-level docs in each `lib.rs` are already written |
+| `wxy` command | Generated from `wxy --help` into a page here | Not yet; see the [core README](https://github.com/wxylib/core#readme) |
+| R package `wxy` | pkgdown, at wxylib.github.io/r | Not yet; three functions |
+| Python package `wxy` | quartodoc, rendered into this site | Not yet; three functions |
+| Browser module | The [web README](https://github.com/wxylib/web#readme) | |
+| Byte-reference tables | [mdim-refs 0.2 spec](design/specs/mdim-refs-0.2.md) | Reference spec from adjacent work |
+
+## Crates
+
+| Crate | What it does |
+|-------|--------------|
+| `wxy-domain` | The data model: dims, domains, mappings (R0 to R3'), frames, cell conventions. No I/O. |
+| `wxy-source` | Chunk sources: plan, fetch, decode, with chunking in index space. |
+| `wxy-tiff` | GeoTIFF and COG reads through async-tiff. |
+| `wxy-zarr` | Zarr reads through zarrs, georeferenced by GeoZarr `spatial:`/`proj:` or CF coordinates; writes GeoZarr grids. |
+| `wxy-geozarr` | The GeoZarr `spatial:` and `proj:` conventions on their own, usable by any Zarr tool. |
+| `wxy-virtual` | Virtual Zarr: tiled TIFF byte ranges or a byte-reference table as Icechunk virtual references, read back as Zarr. |
+| `wxy-resample` | GDAL's warp kernels in GDAL's arithmetic order, scaled when the target is coarser. |
+| `wxy-warp` | Plan, fetch, resample: regular, rectilinear and curvilinear sources, extra dimensions streamed under one plan; values at points and cells under polygons. |
+| `wxy-cache` | A persistent byte-range cache kept as Parquet rows. |
+| `wxy-cli` | The `wxy` command: `warp`, `points`, `zonal`, each with `--dry-run`. |

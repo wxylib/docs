@@ -1,0 +1,68 @@
+---
+title: "Start here"
+---
+
+## Run it without building anything
+
+The `wxy` command and the Python and R packages are published as
+container images (see [wxylib/images](https://github.com/wxylib/images)).
+None of them contain GDAL or PROJ: everything is pure Rust.
+
+```sh
+git clone --depth 1 https://github.com/wxylib/fixtures
+
+# warp a COG to Antarctic polar stereographic, written as GeoZarr
+docker run --rm -v "$PWD":/data ghcr.io/wxylib/wxy \
+  warp fixtures/cog/world-int16-deflate.tif out.zarr \
+  --crs EPSG:3031 --extent -4e6 -4e6 4e6 4e6 --size 145 145 -r bilinear
+
+# values at lon/lat points, x,y lines on stdin (note -i)
+printf '147.3,-42.9\n-70.6,-33.4\n' |
+  docker run --rm -i -v "$PWD":/data ghcr.io/wxylib/wxy \
+  points fixtures/cog/world-int16-deflate.tif
+
+# the plan as JSON: every chunk it would fetch, reading no data
+docker run --rm -v "$PWD":/data ghcr.io/wxylib/wxy \
+  warp fixtures/cog/world-int16-deflate.tif out.zarr \
+  --crs EPSG:3031 --extent -4e6 -4e6 4e6 4e6 --size 145 145 --dry-run
+```
+
+## Build from source
+
+```sh
+git clone https://github.com/wxylib/core
+git clone https://github.com/wxylib/fixtures
+cd core
+cargo test --workspace
+cargo run -p wxy-cli -- warp ../fixtures/cog/world-int16-deflate.tif out.zarr \
+  --crs EPSG:3031 --extent -4e6 -4e6 4e6 4e6 --size 145 145
+```
+
+The tests find the fixtures at `../fixtures` (or `WXY_FIXTURES`) and skip
+when they are missing.
+
+## From R or Python
+
+Both packages are early spikes that warp in-memory arrays only. Install
+from source as their READMEs describe ([R](https://github.com/wxylib/r),
+[Python](https://github.com/wxylib/py)), or use the `ghcr.io/wxylib/wxy-r`
+and `ghcr.io/wxylib/wxy-py` images.
+
+```r
+library(wxy)
+z <- outer(seq(89.5, -89.5), seq(-179.5, 179.5), function(lat, lon) lat)
+w <- wxy_warp(z, c(-180, 180, -90, 90), "EPSG:4326",
+              dst_extent = c(-5e6, 5e6, -5e6, 5e6), dst_dim = c(200, 200),
+              dst_crs = "+proj=stere +lat_0=-90 +lat_ts=-71 +datum=WGS84",
+              resample = "bilinear")
+```
+
+## Then
+
+- The [OISST walk-through](oisst-virtual.md) reads a month of real sea
+  surface temperature from NOAA's bucket as virtual Zarr, checks it
+  against GDAL, and warps a day to the Antarctic.
+- The [capability map](capabilities.qmd) says what works on which kind of
+  grid, and through which way in.
+- The [how-tos](vignettes/README.md) answer common forum questions with a
+  command or a live page.

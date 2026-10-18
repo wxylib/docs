@@ -1,0 +1,457 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>wxylib Capability Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; the ladder figure and two matrices break wider, each in its own scroll box. */
+:root{
+  --bg:#f6f7f8; --panel:#ffffff; --ink:#1b2430; --muted:#5b6675; --rule:#d9dee4;
+  --accent:#2b5c8a;
+  --built:#2f7d4f; --built-bg:#e3f1e8;
+  --partial:#a86a00; --partial-bg:#fbefd8;
+  --planned:#2d61b0; --planned-bg:#e2ebf8;
+  --asp:#7d8692; --asp-bg:#eceef1;
+  --none:#b8bfc8;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161b; --panel:#191f26; --ink:#e3e8ee; --muted:#9aa5b2; --rule:#2c343e; --accent:#7fb0e0;
+  --built:#6cc792; --built-bg:#1a3326; --partial:#e5ad4a; --partial-bg:#3a2c12;
+  --planned:#7fa8eb; --planned-bg:#1b2a44; --asp:#9aa3ae; --asp-bg:#252c34; --none:#4a535e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161b; --panel:#191f26; --ink:#e3e8ee; --muted:#9aa5b2; --rule:#2c343e; --accent:#7fb0e0;
+  --built:#6cc792; --built-bg:#1a3326; --partial:#e5ad4a; --partial-bg:#3a2c12;
+  --planned:#7fa8eb; --planned-bg:#1b2a44; --asp:#9aa3ae; --asp-bg:#252c34; --none:#4a535e; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+.prose{max-width:68ch}
+h1,h2{font-family:var(--f-display);font-weight:650;text-wrap:balance;margin:0;letter-spacing:-0.01em}
+h1{font-size:2.2rem;line-height:1.1}
+h2{font-size:1.45rem;line-height:1.2}
+h3{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 6px;font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:0.78rem;color:var(--muted);letter-spacing:0.02em}
+section{display:flex;flex-direction:column;gap:12px}
+code,.mono{font-family:var(--f-mono);font-size:0.86em}
+a{color:var(--accent)}
+.lede{font-size:1.06rem;color:var(--ink)}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:0.9rem;color:var(--muted)}
+.facts b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:0.85rem;align-items:center}
+.k{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block;border:1.5px solid}
+.sw.built{background:var(--built-bg);border-color:var(--built)}
+.sw.partial{background:var(--partial-bg);border-color:var(--partial)}
+.sw.planned{background:var(--planned-bg);border-color:var(--planned)}
+.sw.asp{background:var(--asp-bg);border-color:var(--asp);border-style:dashed}
+.sw.none{background:transparent;border-color:var(--none)}
+.fig{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:16px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:760px;height:auto}
+.figcap{font-size:0.85rem;color:var(--muted);max-width:80ch}
+/* svg classes */
+.ln{fill:none;stroke-width:1.4}
+.dot{stroke:none}
+.fillp{fill-opacity:0.18}
+.gcp{fill:none;stroke-width:1.6}
+.g-built .ln,.g-built .gcp{stroke:var(--built)} .g-built .dot,.g-built .fillp{fill:var(--built)}
+.g-partial .ln,.g-partial .gcp{stroke:var(--partial)} .g-partial .dot,.g-partial .fillp{fill:var(--partial)}
+.g-planned .ln{stroke:var(--planned)} .g-planned .dot{fill:var(--planned)}
+.g-asp .ln{stroke:var(--asp);stroke-dasharray:3 3} .g-asp .dot{fill:var(--asp)} .g-asp .gcp{stroke:var(--partial)}
+.rk{font-family:var(--f-mono);font-size:15px;font-weight:500;text-anchor:middle;fill:var(--ink)}
+.rn{font-family:var(--f-body);font-size:13px;text-anchor:middle;fill:var(--muted)}
+.pill rect{stroke-width:1.2}
+.pt{font-family:var(--f-body);font-size:11px;text-anchor:middle;font-weight:600}
+.p-built rect{fill:var(--built-bg);stroke:var(--built)} .p-built text{fill:var(--built)}
+.p-partial rect{fill:var(--partial-bg);stroke:var(--partial)} .p-partial text{fill:var(--partial)}
+.p-planned rect{fill:var(--planned-bg);stroke:var(--planned)} .p-planned text{fill:var(--planned)}
+.p-asp rect{fill:var(--asp-bg);stroke:var(--asp);stroke-dasharray:3 2} .p-asp text{fill:var(--asp)}
+.br{fill:none;stroke:var(--muted);stroke-width:1}
+.bt{font-size:12px;text-anchor:middle;fill:var(--muted);font-family:var(--f-body)}
+.arc{fill:none;stroke-width:1.5}
+.arc.built{stroke:var(--built)} .arc.partial{stroke:var(--partial);stroke-dasharray:5 3}
+.ahb{fill:var(--built)} .ahp{fill:var(--partial)}
+.at{font-size:12px;font-family:var(--f-body)}
+.at.built{fill:var(--built)} .at.partial{fill:var(--partial)}
+/* matrices */
+.tbox{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:0.86rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top;text-align:left}
+thead th{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);font-weight:600;background:var(--panel);position:sticky;top:0}
+tbody th{font-weight:500;white-space:nowrap}
+tbody th .mono{display:block;font-size:0.9rem}
+tbody th small{color:var(--muted);font-weight:400}
+tr:last-child td,tr:last-child th{border-bottom:0}
+.c{display:flex;gap:7px;align-items:flex-start;min-width:0}
+.c::before{content:"";flex:0 0 11px;height:11px;margin-top:4px;border-radius:2px;border:1.5px solid}
+.c.built::before{background:var(--built-bg);border-color:var(--built)}
+.c.partial::before{background:var(--partial-bg);border-color:var(--partial)}
+.c.planned::before{background:var(--planned-bg);border-color:var(--planned)}
+.c.asp::before{background:var(--asp-bg);border-color:var(--asp);border-style:dashed}
+.c.none::before{background:transparent;border-color:var(--none)}
+.c.na{color:var(--muted)} .c.na::before{border-color:transparent}
+.c span{min-width:0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card p,.card li{font-size:0.9rem}
+.card ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.tag{font-family:var(--f-mono);font-size:0.75rem;color:var(--muted)}
+.foot{font-size:0.82rem;color:var(--muted);border-top:1px solid var(--rule);padding-top:14px}
+</style>
+
+<div class="wrap">
+<header style="display:flex;flex-direction:column;gap:10px">
+  <div class="eyebrow">wxylib/core at 3abd248 &middot; read 2026-10-18</div>
+  <h1>Where wxylib core stands on the spectrum</h1>
+  <p class="lede prose">The structured half of the ladder (R0 to R3) is built end to end and matches GDAL 3.12 on every fixture. R6 features are in as <em>inputs</em> to extraction, not yet as data the model holds. R3', R4 and R5 exist only as type slots. The full API lives in Rust and the CLI; Python and R bind three in-memory functions, and the browser binds COG warping.</p>
+  <div class="facts"><span><b>10</b> crates</span><span><b>~10.7k</b> lines of library source</span><span><b>3</b> CLI verbs: warp, points, zonal</span><span><b>62</b> test functions, each against a GDAL oracle</span></div>
+</header>
+
+<div class="legend" aria-label="Legend">
+  <span class="k"><i class="sw built"></i>built and GDAL-checked</span>
+  <span class="k"><i class="sw partial"></i>built with known gaps</span>
+  <span class="k"><i class="sw planned"></i>planned in a numbered stage</span>
+  <span class="k"><i class="sw asp"></i>type slot or aspiration</span>
+  <span class="k"><i class="sw none"></i>not there yet</span>
+</div>
+
+<section>
+  <h2>The ladder</h2>
+  <div class="fig"><svg viewBox="0 0 960 400" role="img" aria-labelledby="ladder-t" xmlns="http://www.w3.org/2000/svg">
+<title id="ladder-t">The position ladder R0 to R6, coloured by how much of each rung wxylib core implements</title>
+<defs>
+<marker id="ah-built" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ahb"/></marker>
+<marker id="ah-partial" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ahp"/></marker>
+</defs>
+<g class="g-built">
+<circle cx="28" cy="56" r="2.6" class="dot"/>
+<circle cx="28" cy="72" r="2.6" class="dot"/>
+<circle cx="28" cy="88" r="2.6" class="dot"/>
+<circle cx="28" cy="104" r="2.6" class="dot"/>
+<circle cx="28" cy="120" r="2.6" class="dot"/>
+<circle cx="44" cy="56" r="2.6" class="dot"/>
+<circle cx="44" cy="72" r="2.6" class="dot"/>
+<circle cx="44" cy="88" r="2.6" class="dot"/>
+<circle cx="44" cy="104" r="2.6" class="dot"/>
+<circle cx="44" cy="120" r="2.6" class="dot"/>
+<circle cx="60" cy="56" r="2.6" class="dot"/>
+<circle cx="60" cy="72" r="2.6" class="dot"/>
+<circle cx="60" cy="88" r="2.6" class="dot"/>
+<circle cx="60" cy="104" r="2.6" class="dot"/>
+<circle cx="60" cy="120" r="2.6" class="dot"/>
+<circle cx="76" cy="56" r="2.6" class="dot"/>
+<circle cx="76" cy="72" r="2.6" class="dot"/>
+<circle cx="76" cy="88" r="2.6" class="dot"/>
+<circle cx="76" cy="104" r="2.6" class="dot"/>
+<circle cx="76" cy="120" r="2.6" class="dot"/>
+<circle cx="92" cy="56" r="2.6" class="dot"/>
+<circle cx="92" cy="72" r="2.6" class="dot"/>
+<circle cx="92" cy="88" r="2.6" class="dot"/>
+<circle cx="92" cy="104" r="2.6" class="dot"/>
+<circle cx="92" cy="120" r="2.6" class="dot"/>
+</g>
+<text x="60" y="24" class="rk">R0</text>
+<text x="60" y="152" class="rn">index only</text>
+<g class="pill p-built"><rect x="16" y="162" width="88" height="20" rx="10"/><text x="60" y="176" class="pt">built</text></g>
+<g class="g-built">
+<line x1="140.0" y1="48.0" x2="140.0" y2="128.0" class="ln"/>
+<line x1="140.0" y1="48.0" x2="220.0" y2="48.0" class="ln"/>
+<line x1="156.0" y1="48.0" x2="156.0" y2="128.0" class="ln"/>
+<line x1="140.0" y1="64.0" x2="220.0" y2="64.0" class="ln"/>
+<line x1="172.0" y1="48.0" x2="172.0" y2="128.0" class="ln"/>
+<line x1="140.0" y1="80.0" x2="220.0" y2="80.0" class="ln"/>
+<line x1="188.0" y1="48.0" x2="188.0" y2="128.0" class="ln"/>
+<line x1="140.0" y1="96.0" x2="220.0" y2="96.0" class="ln"/>
+<line x1="204.0" y1="48.0" x2="204.0" y2="128.0" class="ln"/>
+<line x1="140.0" y1="112.0" x2="220.0" y2="112.0" class="ln"/>
+<line x1="220.0" y1="48.0" x2="220.0" y2="128.0" class="ln"/>
+<line x1="140.0" y1="128.0" x2="220.0" y2="128.0" class="ln"/>
+</g>
+<text x="180" y="24" class="rk">R1</text>
+<text x="180" y="152" class="rn">regular</text>
+<g class="pill p-built"><rect x="136" y="162" width="88" height="20" rx="10"/><text x="180" y="176" class="pt">built</text></g>
+<g class="g-built">
+<line x1="260.0" y1="48.0" x2="260.0" y2="128.0" class="ln"/>
+<line x1="268.0" y1="48.0" x2="268.0" y2="128.0" class="ln"/>
+<line x1="280.0" y1="48.0" x2="280.0" y2="128.0" class="ln"/>
+<line x1="296.0" y1="48.0" x2="296.0" y2="128.0" class="ln"/>
+<line x1="316.0" y1="48.0" x2="316.0" y2="128.0" class="ln"/>
+<line x1="340.0" y1="48.0" x2="340.0" y2="128.0" class="ln"/>
+<line x1="260.0" y1="48.0" x2="340.0" y2="48.0" class="ln"/>
+<line x1="260.0" y1="70.0" x2="340.0" y2="70.0" class="ln"/>
+<line x1="260.0" y1="86.0" x2="340.0" y2="86.0" class="ln"/>
+<line x1="260.0" y1="98.0" x2="340.0" y2="98.0" class="ln"/>
+<line x1="260.0" y1="110.0" x2="340.0" y2="110.0" class="ln"/>
+<line x1="260.0" y1="128.0" x2="340.0" y2="128.0" class="ln"/>
+</g>
+<text x="300" y="24" class="rk">R2</text>
+<text x="300" y="152" class="rn">rectilinear</text>
+<g class="pill p-built"><rect x="256" y="162" width="88" height="20" rx="10"/><text x="300" y="176" class="pt">built</text></g>
+<g class="g-partial">
+<polyline class="ln" points="404.3,67.6 403.0,69.8 401.6,72.0 400.2,74.2 398.9,76.4 397.5,78.7 396.2,80.9 394.8,83.1 393.4,85.3 392.1,87.5 390.7,89.7 389.4,92.0 388.0,94.2 386.7,96.4 385.3,98.6 383.9,100.8 382.6,103.0 381.2,105.3 379.9,107.5 378.5,109.7 377.1,111.9"/>
+<polyline class="ln" points="404.3,67.6 405.7,68.4 407.2,69.1 408.7,69.8 410.3,70.4 411.9,70.9 413.5,71.3 415.1,71.6 416.7,71.8 418.4,72.0 420.0,72.0 421.6,72.0 423.3,71.8 424.9,71.6 426.5,71.3 428.1,70.9 429.7,70.4 431.3,69.8 432.8,69.1 434.3,68.4 435.7,67.6"/>
+<polyline class="ln" points="410.3,70.4 409.4,72.8 408.6,75.3 407.8,77.8 406.9,80.2 406.1,82.7 405.2,85.1 404.4,87.6 403.5,90.1 402.7,92.5 401.9,95.0 401.0,97.4 400.2,99.9 399.3,102.4 398.5,104.8 397.6,107.3 396.8,109.7 396.0,112.2 395.1,114.7 394.3,117.1 393.4,119.6"/>
+<polyline class="ln" points="398.9,76.4 400.8,77.6 402.8,78.6 404.8,79.4 406.9,80.2 409.0,80.9 411.2,81.4 413.4,81.9 415.6,82.2 417.8,82.3 420.0,82.4 422.2,82.3 424.4,82.2 426.6,81.9 428.8,81.4 431.0,80.9 433.1,80.2 435.2,79.4 437.2,78.6 439.2,77.6 441.1,76.4"/>
+<polyline class="ln" points="416.7,71.8 416.4,74.4 416.1,77.0 415.9,79.6 415.6,82.2 415.3,84.7 415.0,87.3 414.7,89.9 414.4,92.5 414.1,95.1 413.9,97.7 413.6,100.2 413.3,102.8 413.0,105.4 412.7,108.0 412.4,110.6 412.1,113.2 411.9,115.8 411.6,118.3 411.3,120.9 411.0,123.5"/>
+<polyline class="ln" points="393.4,85.3 395.9,86.7 398.4,88.0 400.9,89.1 403.5,90.1 406.2,90.9 408.9,91.6 411.7,92.1 414.4,92.5 417.2,92.7 420.0,92.8 422.8,92.7 425.6,92.5 428.3,92.1 431.1,91.6 433.8,90.9 436.5,90.1 439.1,89.1 441.6,88.0 444.1,86.7 446.6,85.3"/>
+<polyline class="ln" points="423.3,71.8 423.6,74.4 423.9,77.0 424.1,79.6 424.4,82.2 424.7,84.7 425.0,87.3 425.3,89.9 425.6,92.5 425.9,95.1 426.1,97.7 426.4,100.2 426.7,102.8 427.0,105.4 427.3,108.0 427.6,110.6 427.9,113.2 428.1,115.8 428.4,118.3 428.7,120.9 429.0,123.5"/>
+<polyline class="ln" points="388.0,94.2 390.9,95.9 393.9,97.4 397.0,98.7 400.2,99.9 403.4,100.9 406.6,101.7 409.9,102.4 413.3,102.8 416.6,103.1 420.0,103.2 423.4,103.1 426.7,102.8 430.1,102.4 433.4,101.7 436.6,100.9 439.8,99.9 443.0,98.7 446.1,97.4 449.1,95.9 452.0,94.2"/>
+<polyline class="ln" points="429.7,70.4 430.6,72.8 431.4,75.3 432.2,77.8 433.1,80.2 433.9,82.7 434.8,85.1 435.6,87.6 436.5,90.1 437.3,92.5 438.1,95.0 439.0,97.4 439.8,99.9 440.7,102.4 441.5,104.8 442.4,107.3 443.2,109.7 444.0,112.2 444.9,114.7 445.7,117.1 446.6,119.6"/>
+<polyline class="ln" points="382.6,103.0 386.0,105.0 389.5,106.8 393.1,108.4 396.8,109.7 400.6,110.9 404.4,111.9 408.2,112.6 412.1,113.2 416.1,113.5 420.0,113.6 423.9,113.5 427.9,113.2 431.8,112.6 435.6,111.9 439.4,110.9 443.2,109.7 446.9,108.4 450.5,106.8 454.0,105.0 457.4,103.0"/>
+<polyline class="ln" points="435.7,67.6 437.0,69.8 438.4,72.0 439.8,74.2 441.1,76.4 442.5,78.7 443.8,80.9 445.2,83.1 446.6,85.3 447.9,87.5 449.3,89.7 450.6,92.0 452.0,94.2 453.3,96.4 454.7,98.6 456.1,100.8 457.4,103.0 458.8,105.3 460.1,107.5 461.5,109.7 462.9,111.9"/>
+<polyline class="ln" points="377.1,111.9 381.0,114.2 385.1,116.2 389.2,118.0 393.4,119.6 397.7,120.9 402.1,122.0 406.5,122.9 411.0,123.5 415.5,123.9 420.0,124.0 424.5,123.9 429.0,123.5 433.5,122.9 437.9,122.0 442.3,120.9 446.6,119.6 450.8,118.0 454.9,116.2 459.0,114.2 462.9,111.9"/>
+</g>
+<text x="420" y="24" class="rk">R3</text>
+<text x="420" y="152" class="rn">curvilinear</text>
+<g class="pill p-partial"><rect x="376" y="162" width="88" height="20" rx="10"/><text x="420" y="176" class="pt">built, gaps</text></g>
+<g class="g-asp">
+<polyline class="ln" points="524.3,67.6 523.0,69.8 521.6,72.0 520.2,74.2 518.9,76.4 517.5,78.7 516.2,80.9 514.8,83.1 513.4,85.3 512.1,87.5 510.7,89.7 509.4,92.0 508.0,94.2 506.7,96.4 505.3,98.6 503.9,100.8 502.6,103.0 501.2,105.3 499.9,107.5 498.5,109.7 497.1,111.9"/>
+<polyline class="ln" points="524.3,67.6 525.7,68.4 527.2,69.1 528.7,69.8 530.3,70.4 531.9,70.9 533.5,71.3 535.1,71.6 536.7,71.8 538.4,72.0 540.0,72.0 541.6,72.0 543.3,71.8 544.9,71.6 546.5,71.3 548.1,70.9 549.7,70.4 551.3,69.8 552.8,69.1 554.3,68.4 555.7,67.6"/>
+<polyline class="ln" points="530.3,70.4 529.4,72.8 528.6,75.3 527.8,77.8 526.9,80.2 526.1,82.7 525.2,85.1 524.4,87.6 523.5,90.1 522.7,92.5 521.9,95.0 521.0,97.4 520.2,99.9 519.3,102.4 518.5,104.8 517.6,107.3 516.8,109.7 516.0,112.2 515.1,114.7 514.3,117.1 513.4,119.6"/>
+<polyline class="ln" points="518.9,76.4 520.8,77.6 522.8,78.6 524.8,79.4 526.9,80.2 529.0,80.9 531.2,81.4 533.4,81.9 535.6,82.2 537.8,82.3 540.0,82.4 542.2,82.3 544.4,82.2 546.6,81.9 548.8,81.4 551.0,80.9 553.1,80.2 555.2,79.4 557.2,78.6 559.2,77.6 561.1,76.4"/>
+<polyline class="ln" points="536.7,71.8 536.4,74.4 536.1,77.0 535.9,79.6 535.6,82.2 535.3,84.7 535.0,87.3 534.7,89.9 534.4,92.5 534.1,95.1 533.9,97.7 533.6,100.2 533.3,102.8 533.0,105.4 532.7,108.0 532.4,110.6 532.1,113.2 531.9,115.8 531.6,118.3 531.3,120.9 531.0,123.5"/>
+<polyline class="ln" points="513.4,85.3 515.9,86.7 518.4,88.0 520.9,89.1 523.5,90.1 526.2,90.9 528.9,91.6 531.7,92.1 534.4,92.5 537.2,92.7 540.0,92.8 542.8,92.7 545.6,92.5 548.3,92.1 551.1,91.6 553.8,90.9 556.5,90.1 559.1,89.1 561.6,88.0 564.1,86.7 566.6,85.3"/>
+<polyline class="ln" points="543.3,71.8 543.6,74.4 543.9,77.0 544.1,79.6 544.4,82.2 544.7,84.7 545.0,87.3 545.3,89.9 545.6,92.5 545.9,95.1 546.1,97.7 546.4,100.2 546.7,102.8 547.0,105.4 547.3,108.0 547.6,110.6 547.9,113.2 548.1,115.8 548.4,118.3 548.7,120.9 549.0,123.5"/>
+<polyline class="ln" points="508.0,94.2 510.9,95.9 513.9,97.4 517.0,98.7 520.2,99.9 523.4,100.9 526.6,101.7 529.9,102.4 533.3,102.8 536.6,103.1 540.0,103.2 543.4,103.1 546.7,102.8 550.1,102.4 553.4,101.7 556.6,100.9 559.8,99.9 563.0,98.7 566.1,97.4 569.1,95.9 572.0,94.2"/>
+<polyline class="ln" points="549.7,70.4 550.6,72.8 551.4,75.3 552.2,77.8 553.1,80.2 553.9,82.7 554.8,85.1 555.6,87.6 556.5,90.1 557.3,92.5 558.1,95.0 559.0,97.4 559.8,99.9 560.7,102.4 561.5,104.8 562.4,107.3 563.2,109.7 564.0,112.2 564.9,114.7 565.7,117.1 566.6,119.6"/>
+<polyline class="ln" points="502.6,103.0 506.0,105.0 509.5,106.8 513.1,108.4 516.8,109.7 520.6,110.9 524.4,111.9 528.2,112.6 532.1,113.2 536.1,113.5 540.0,113.6 543.9,113.5 547.9,113.2 551.8,112.6 555.6,111.9 559.4,110.9 563.2,109.7 566.9,108.4 570.5,106.8 574.0,105.0 577.4,103.0"/>
+<polyline class="ln" points="555.7,67.6 557.0,69.8 558.4,72.0 559.8,74.2 561.1,76.4 562.5,78.7 563.8,80.9 565.2,83.1 566.6,85.3 567.9,87.5 569.3,89.7 570.6,92.0 572.0,94.2 573.3,96.4 574.7,98.6 576.1,100.8 577.4,103.0 578.8,105.3 580.1,107.5 581.5,109.7 582.9,111.9"/>
+<polyline class="ln" points="497.1,111.9 501.0,114.2 505.1,116.2 509.2,118.0 513.4,119.6 517.7,120.9 522.1,122.0 526.5,122.9 531.0,123.5 535.5,123.9 540.0,124.0 544.5,123.9 549.0,123.5 553.5,122.9 557.9,122.0 562.3,120.9 566.6,119.6 570.8,118.0 574.9,116.2 579.0,114.2 582.9,111.9"/>
+<path class="gcp" d="M520.0,73.8h10M525.0,68.8v10"/>
+<path class="gcp" d="M551.1,76.2h10M556.1,71.2v10"/>
+<path class="gcp" d="M535.0,98.0h10M540.0,93.0v10"/>
+<path class="gcp" d="M506.2,113.2h10M511.2,108.2v10"/>
+<path class="gcp" d="M562.9,110.8h10M567.9,105.8v10"/>
+</g>
+<text x="540" y="24" class="rk">R3&#39;</text>
+<text x="540" y="152" class="rn">fitted</text>
+<g class="pill p-asp"><rect x="496" y="162" width="88" height="20" rx="10"/><text x="540" y="176" class="pt">type slot only</text></g>
+<g class="g-asp">
+<polygon class="ln" points="639.5,63.5 630.0,69.0 620.5,63.5 620.5,52.5 630.0,47.0 639.5,52.5"/>
+<polygon class="ln" points="658.8,63.5 649.2,69.0 639.7,63.5 639.7,52.5 649.2,47.0 658.8,52.5"/>
+<polygon class="ln" points="678.0,63.5 668.5,69.0 659.0,63.5 659.0,52.5 668.5,47.0 678.0,52.5"/>
+<polygon class="ln" points="697.3,63.5 687.8,69.0 678.2,63.5 678.2,52.5 687.8,47.0 697.3,52.5"/>
+<polygon class="ln" points="649.2,80.0 639.6,85.5 630.1,80.0 630.1,69.0 639.6,63.5 649.2,69.0"/>
+<polygon class="ln" points="668.4,80.0 658.9,85.5 649.3,80.0 649.3,69.0 658.9,63.5 668.4,69.0"/>
+<polygon class="ln" points="687.7,80.0 678.1,85.5 668.6,80.0 668.6,69.0 678.1,63.5 687.7,69.0"/>
+<polygon class="ln" points="706.9,80.0 697.4,85.5 687.8,80.0 687.8,69.0 697.4,63.5 706.9,69.0"/>
+<polygon class="ln" points="639.5,96.5 630.0,102.0 620.5,96.5 620.5,85.5 630.0,80.0 639.5,85.5"/>
+<polygon class="ln" points="658.8,96.5 649.2,102.0 639.7,96.5 639.7,85.5 649.2,80.0 658.8,85.5"/>
+<polygon class="ln" points="678.0,96.5 668.5,102.0 659.0,96.5 659.0,85.5 668.5,80.0 678.0,85.5"/>
+<polygon class="ln" points="697.3,96.5 687.8,102.0 678.2,96.5 678.2,85.5 687.8,80.0 697.3,85.5"/>
+<polygon class="ln" points="649.2,113.0 639.6,118.5 630.1,113.0 630.1,102.0 639.6,96.5 649.2,102.0"/>
+<polygon class="ln" points="668.4,113.0 658.9,118.5 649.3,113.0 649.3,102.0 658.9,96.5 668.4,102.0"/>
+<polygon class="ln" points="687.7,113.0 678.1,118.5 668.6,113.0 668.6,102.0 678.1,96.5 687.7,102.0"/>
+<polygon class="ln" points="706.9,113.0 697.4,118.5 687.8,113.0 687.8,102.0 697.4,96.5 706.9,102.0"/>
+</g>
+<text x="660" y="24" class="rk">R4</text>
+<text x="660" y="152" class="rn">implicit mesh</text>
+<g class="pill p-asp"><rect x="616" y="162" width="88" height="20" rx="10"/><text x="660" y="176" class="pt">type slot only</text></g>
+<g class="g-planned">
+<polygon class="ln" points="740,58 766,48 780,80"/>
+<polygon class="ln" points="766,48 796,54 780,80"/>
+<polygon class="ln" points="796,54 820,70 810,98"/>
+<polygon class="ln" points="796,54 780,80 810,98"/>
+<polygon class="ln" points="740,58 750,90 780,80"/>
+<polygon class="ln" points="750,90 780,80 770,118"/>
+<polygon class="ln" points="780,80 810,98 770,118"/>
+<polygon class="ln" points="750,90 740,126 770,118"/>
+<polygon class="ln" points="810,98 770,118 802,128"/>
+<polygon class="ln" points="810,98 802,128 820,122"/>
+<polygon class="ln" points="820,70 810,98 820,122"/>
+<circle cx="740" cy="58" r="2.2" class="dot"/>
+<circle cx="766" cy="48" r="2.2" class="dot"/>
+<circle cx="796" cy="54" r="2.2" class="dot"/>
+<circle cx="820" cy="70" r="2.2" class="dot"/>
+<circle cx="750" cy="90" r="2.2" class="dot"/>
+<circle cx="780" cy="80" r="2.2" class="dot"/>
+<circle cx="810" cy="98" r="2.2" class="dot"/>
+<circle cx="740" cy="126" r="2.2" class="dot"/>
+<circle cx="770" cy="118" r="2.2" class="dot"/>
+<circle cx="802" cy="128" r="2.2" class="dot"/>
+<circle cx="820" cy="122" r="2.2" class="dot"/>
+</g>
+<text x="780" y="24" class="rk">R5</text>
+<text x="780" y="152" class="rn">explicit mesh</text>
+<g class="pill p-planned"><rect x="736" y="162" width="88" height="20" rx="10"/><text x="780" y="176" class="pt">staged (S8)</text></g>
+<g class="g-partial">
+<polygon class="ln fillp" points="864,58 896,50 904,78 874,88"/>
+<polygon class="ln fillp" points="910,88 938,94 930,124 904,114"/>
+<polyline class="ln" points="864,122 878,104 890,112"/>
+<circle cx="920" cy="60" r="2.8" class="dot"/>
+<circle cx="932" cy="70" r="2.8" class="dot"/>
+<circle cx="916" cy="72" r="2.8" class="dot"/>
+</g>
+<text x="900" y="24" class="rk">R6</text>
+<text x="900" y="152" class="rn">features</text>
+<g class="pill p-partial"><rect x="856" y="162" width="88" height="20" rx="10"/><text x="900" y="176" class="pt">as queries</text></g>
+<path class="br" d="M12,226 v8 H588 v-8"/>
+<text x="300.0" y="252" class="bt">one family: logically rectangular, topology from the (i, j) index</text>
+<path class="br" d="M612,226 v8 H948 v-8"/>
+<text x="780.0" y="252" class="bt">one family: no (i, j) index</text>
+<text x="180" y="292" class="bt">conversions to R1 that run today</text>
+<circle cx="300" cy="322" r="3" class="ahb"/>
+<path class="arc built" d="M300,322 H188" marker-end="url(#ah-built)"/>
+<text x="292" y="315" class="at built" text-anchor="end">normalise</text>
+<circle cx="420" cy="352" r="3" class="ahp"/>
+<path class="arc partial" d="M420,352 H188" marker-end="url(#ah-partial)"/>
+<text x="412" y="345" class="at partial" text-anchor="end">R3 to R1 in another frame (a test; not automatic)</text>
+<circle cx="900" cy="382" r="3" class="ahb"/>
+<path class="arc built" d="M900,382 H188" marker-end="url(#ah-built)"/>
+<text x="892" y="375" class="at built" text-anchor="end">rasterize, or exact coverage: features to R1 cells</text>
+</svg></div>
+  <p class="figcap">Each rung stores strictly more than the one before (design doc 02, section 3). Every <code>Positions</code> variant in <code>wxy-domain</code> exists, so types will not change when rungs arrive; only R0 to R3 evaluate positions. Arrows are the conversions that run today.</p>
+</section>
+
+<section>
+  <h2>Rung by verb</h2>
+  <p class="prose">Rows are rungs; columns are the things the library does. The warp, points and zonal columns all go through one plan seam in <code>wxy-warp</code>, so a rung that warps also extracts.</p>
+  <div class="tbox"><table>
+  <thead><tr><th>Rung</th><th>Model</th><th>Read</th><th>Normalise</th><th>Warp from</th><th>Points</th><th>Zonal / burn</th><th>Write</th><th>Virtual refs</th></tr></thead>
+  <tbody>
+  <tr><th><span class="mono">R0</span><small>index only</small></th>
+    <td><div class="c built"><span><code>IndexOnly</code></span></div></td>
+    <td><div class="c built"><span>unmapped dims (TIFF band, any Zarr dim)</span></div></td>
+    <td><div class="c na"><span>n/a</span></div></td>
+    <td><div class="c na"><span>needs a CRS frame</span></div></td>
+    <td><div class="c na"><span>n/a</span></div></td>
+    <td><div class="c na"><span>n/a</span></div></td>
+    <td><div class="c built"><span>leading 1D coords copied byte for byte</span></div></td>
+    <td><div class="c built"><span>arrays referenced whatever their georef</span></div></td></tr>
+  <tr><th><span class="mono">R1</span><small>regular</small></th>
+    <td><div class="c built"><span><code>Affine</code>, <code>Regular1</code></span></div></td>
+    <td><div class="c built"><span>tiled GeoTIFF/COG, chunky or planar, overviews; Zarr with GeoZarr <code>spatial:</code>/<code>proj:</code></span></div></td>
+    <td><div class="c na"><span>target of normalisation</span></div></td>
+    <td><div class="c built"><span>chunked like gdalwarp, scaled kernels, <code>-ovr auto</code>, <code>-wm</code>, globe wrap, extra dims streamed</span></div></td>
+    <td><div class="c built"><span>near, bilinear, cubic, cubicspline</span></div></td>
+    <td><div class="c built"><span>centre, all-touched, exact coverage</span></div></td>
+    <td><div class="c built"><span>GeoZarr grid, windowed writer</span></div></td>
+    <td><div class="c partial"><span>TIFF scan (no LZW, no predictor); mdim-refs table to Icechunk</span></div></td></tr>
+  <tr><th><span class="mono">R2</span><small>rectilinear</small></th>
+    <td><div class="c built"><span><code>Rectilinear</code></span></div></td>
+    <td><div class="c built"><span>CF 1D coordinate arrays in Zarr</span></div></td>
+    <td><div class="c built"><span>to R1 within float32/f64/absolute tolerance, also through a frame (Mercator y), with a report</span></div></td>
+    <td><div class="c built"><span>as R1 when regular, else expanded to geolocation</span></div></td>
+    <td><div class="c built"><span>same path as warp</span></div></td>
+    <td><div class="c built"><span>same path as warp</span></div></td>
+    <td><div class="c none"><span>writes an affine only</span></div></td>
+    <td><div class="c partial"><span>inline coords from mdim-refs</span></div></td></tr>
+  <tr><th><span class="mono">R3</span><small>curvilinear</small></th>
+    <td><div class="c built"><span><code>Curvilinear</code>, centre or edge</span></div></td>
+    <td><div class="c partial"><span>CF 2D lon/lat in Zarr, bounds as edges; no netCDF, no 1D CF bounds, no <code>grid_mapping</code></span></div></td>
+    <td><div class="c partial"><span>R3 to R1 in another frame: test exists, caller supplies the projection</span></div></td>
+    <td><div class="c built"><span>GDAL geolocation-array parity, swaths and polar grids</span></div></td>
+    <td><div class="c built"><span>inverse of the geolocation arrays</span></div></td>
+    <td><div class="c built"><span>index-space areas</span></div></td>
+    <td><div class="c none"><span>not yet</span></div></td>
+    <td><div class="c none"><span>not yet</span></div></td></tr>
+  <tr><th><span class="mono">R3'</span><small>fitted</small></th>
+    <td><div class="c asp"><span><code>FittedModel</code> trait</span></div></td>
+    <td><div class="c none"><span>no GCP, RPC or TPS reader</span></div></td>
+    <td><div class="c na"><span>n/a</span></div></td>
+    <td><div class="c none"><span>rejected as unsupported</span></div></td>
+    <td><div class="c none"><span></span></div></td>
+    <td><div class="c none"><span></span></div></td>
+    <td><div class="c none"><span></span></div></td>
+    <td><div class="c none"><span></span></div></td></tr>
+  <tr><th><span class="mono">R4</span><small>implicit mesh</small></th>
+    <td><div class="c asp"><span><code>CellScheme</code> trait (centre from id)</span></div></td>
+    <td colspan="7"><div class="c asp"><span>DGGS and L3 bins sit under the mesh umbrella, "a home in time, not day 1". No stage yet.</span></div></td></tr>
+  <tr><th><span class="mono">R5</span><small>explicit mesh</small></th>
+    <td><div class="c asp"><span><code>Elements</code> trait, opaque</span></div></td>
+    <td colspan="7"><div class="c planned"><span>S8: meshspec v0.1, UGRID through existing readers, conversion first; topology module and overlay after.</span></div></td></tr>
+  <tr><th><span class="mono">R6</span><small>features</small></th>
+    <td><div class="c asp"><span><code>Elements</code> trait; GeoArrow chosen, not wired</span></div></td>
+    <td><div class="c partial"><span>CLI parses GeoJSON polygons and x,y points; not a <code>Collection</code></span></div></td>
+    <td><div class="c na"><span>n/a</span></div></td>
+    <td><div class="c na"><span>n/a</span></div></td>
+    <td><div class="c built"><span>points are the query</span></div></td>
+    <td><div class="c built"><span>polygons are the zones (controlledburn for coverage)</span></div></td>
+    <td><div class="c none"><span>CSV results only</span></div></td>
+    <td><div class="c planned"><span>S7 scheme covers features</span></div></td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <h2>API surface</h2>
+  <p class="prose">What each way in can do today. Python and R are spikes pinned to core <code>39b07bb</code> (S5), so they predate mdim streaming, curvilinear warp, extraction and plans.</p>
+  <div class="tbox"><table>
+  <thead><tr><th>Capability</th><th>Rust crates</th><th><code>wxy</code> CLI</th><th>Python (pyo3)</th><th>R (extendr)</th><th>Browser (wasm)</th></tr></thead>
+  <tbody>
+  <tr><th>Open GeoTIFF / COG</th>
+    <td><div class="c built"><span><code>wxy-tiff</code>: path, any <code>object_store</code></span></div></td>
+    <td><div class="c built"><span>local file</span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td>
+    <td><div class="c built"><span>HTTP range requests</span></div></td></tr>
+  <tr><th>Open Zarr</th>
+    <td><div class="c built"><span><code>wxy-zarr</code> via zarrs, v2/v3, sharding</span></div></td>
+    <td><div class="c built"><span>store directory, <code>--array</code></span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td>
+    <td><div class="c none"><span><code>Send</code>/<code>Sync</code> bound blocks wasm</span></div></td></tr>
+  <tr><th>Domain model, R2 to R1 test</th>
+    <td><div class="c built"><span><code>wxy-domain</code>, <code>normalise</code></span></div></td>
+    <td><div class="c none"><span></span></div></td>
+    <td><div class="c built"><span><code>affine</code>, <code>regular</code></span></div></td>
+    <td><div class="c built"><span><code>wxy_affine</code>, <code>wxy_regular</code></span></div></td>
+    <td><div class="c none"><span></span></div></td></tr>
+  <tr><th>Warp to a grid</th>
+    <td><div class="c built"><span><code>wxy-warp</code>: <code>plan</code>, <code>warp</code>, <code>WarpPlan</code>, <code>warp_pyramid</code></span></div></td>
+    <td><div class="c built"><span><code>wxy warp</code> to GeoZarr</span></div></td>
+    <td><div class="c partial"><span>2D array in, array out, affine source only</span></div></td>
+    <td><div class="c partial"><span>same as Python</span></div></td>
+    <td><div class="c built"><span>COG to the canvas, per view</span></div></td></tr>
+  <tr><th>Multidim streaming</th>
+    <td><div class="c built"><span>leading dims batched under one plan</span></div></td>
+    <td><div class="c built"><span>time/depth coords copied</span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td></tr>
+  <tr><th>Curvilinear warp</th>
+    <td><div class="c built"><span><code>geoloc</code>, centres or edges</span></div></td>
+    <td><div class="c built"><span><code>--bounds</code></span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td></tr>
+  <tr><th>Points, zonal</th>
+    <td><div class="c built"><span><code>extract_points</code>, <code>zonal_stats</code></span></div></td>
+    <td><div class="c built"><span><code>wxy points</code>, <code>wxy zonal --coverage</code></span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td></tr>
+  <tr><th>Plans as values</th>
+    <td><div class="c built"><span><code>Explain</code>, serde options</span></div></td>
+    <td><div class="c built"><span><code>--dry-run</code> JSON</span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td></tr>
+  <tr><th>Write GeoZarr</th>
+    <td><div class="c built"><span><code>GridWriter</code>, <code>wxy-geozarr</code> standalone</span></div></td>
+    <td><div class="c built"><span>warp output</span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c na"><span>n/a</span></div></td></tr>
+  <tr><th>Virtual references</th>
+    <td><div class="c partial"><span><code>scan_tiff</code>, <code>from_refs_table</code>, Icechunk write/read</span></div></td>
+    <td><div class="c none"><span>example only</span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td></tr>
+  <tr><th>Byte-range cache</th>
+    <td><div class="c built"><span><code>wxy-cache</code>, Parquet rows</span></div></td>
+    <td><div class="c partial"><span><code>--cache</code>, GeoTIFF only</span></div></td>
+    <td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td><td><div class="c none"><span></span></div></td></tr>
+  <tr><th>CRS input</th>
+    <td colspan="5"><div class="c partial"><span>Pure Rust proj4rs everywhere: EPSG codes and PROJ strings, no WKT or PROJJSON. <code>wxy warp --crs</code> takes EPSG only, since GeoZarr <code>proj:</code> has nowhere to record a PROJ string. Real PROJ is the open question (rust-proj-capability); proj4rs lacks polar LAEA and AEQD.</span></div></td></tr>
+  <tr><th>Packaging</th>
+    <td colspan="5"><div class="c partial"><span>Docker images for the CLI, Python and R (wxylib/images). No crates.io release yet by choice; rwarp is a git dependency. CI on Ubuntu only.</span></div></td></tr>
+  <tr><th>Shared layers</th>
+    <td colspan="5"><div class="c asp"><span>C ABI (<code>wxy-ffi</code>) and Arrow interchange are the intended base for Julia, DuckDB, Go and JS hosts. Neither exists yet.</span></div></td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <h2>Potential: what the next steps open up</h2>
+  <div class="cols">
+    <div class="card"><span class="tag">S3c &middot; parked on m06 questions</span><h3>Flat refs store</h3><p>A zarrs storage over the mdim-refs Parquet export. Virtual data reads without writing an Icechunk repo first, plans report real stored bytes, and the cache sees every virtual read. It is also the cheapest route to bindings, since a table is all a host needs to hand over.</p></div>
+    <div class="card"><span class="tag">S6 &middot; spikes exist</span><h3>Bindings of the real surface</h3><p>Python and R move from in-memory functions to <code>open</code>, <code>warp</code>, <code>points</code>, <code>zonal</code> and <code>explain</code> on files and stores. Most of the work is a repin and a thin layer, because plans and options already serialise.</p></div>
+    <div class="card"><span class="tag">S7</span><h3>The virtual scheme</h3><p>Select, remap, combine and compute, serialised and written by the library: the VRT replacement, mosaics with gdalbuildvrt-style validation, and the place features and meshes join grids.</p></div>
+    <div class="card"><span class="tag">S8 and later</span><h3>Mesh half of the ladder</h3><ul><li>R5 explicit meshes via UGRID, conversion first.</li><li>R6 as GeoArrow inside the model, so features are data and not only queries.</li><li>R4 schemes (HEALPix, H3, L3 bins) as a <code>CellScheme</code>.</li></ul></div>
+    <div class="card"><span class="tag">R1 to R3 gaps (m07)</span><h3>Index-space depth</h3><ul><li>CF <code>grid_mapping</code>, so rotated-pole and geos read in their frame.</li><li>Periodic and folded dims; cubed-sphere patches.</li><li>Vertical <code>formula_terms</code> as R3' with field terms.</li><li>netCDF input, 1D CF bounds, NaN in geolocation.</li></ul></div>
+    <div class="card"><span class="tag">cross-cutting</span><h3>The <code>transform</code> verb and PROJ</h3><p><code>transform</code> (positions on every rung) is decided but not built; today positions only move inside warp and extraction. A PROJ-backed frame would lift the EPSG-only limit, WKT and PROJJSON with it, and the missing projections.</p></div>
+  </div>
+</section>
+
+<p class="foot">Read from the source of wxylib/core (3abd248), py, r and web on their default branches, and design docs 02, 03 and m07. Status labels are my reading of the code; I did not rerun the test suite for this page. "GDAL-checked" means the crate's tests compare against outputs in wxylib/fixtures made with GDAL 3.12.</p>
+</div>
+
+</body></html>

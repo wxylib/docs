@@ -1,0 +1,75 @@
+---
+title: "wxylib"
+subtitle: "GDAL's modular ideas as small Rust crates, checked cell for cell against GDAL"
+toc: false
+page-layout: full
+---
+
+wxylib takes the ideas inside GDAL (grids, georeferencing, chunked reads,
+warping, virtual datasets), gives each one its own small home, and builds
+on existing crates (async-tiff, zarrs, Icechunk, rwarp) rather than
+replacing them. It is pre-release: nothing is on crates.io yet and APIs
+will change.
+
+![Every dataset sits on one ladder, from a bare array to a table of features. R1 to R3 warp today.](img/spectrum.svg){fig-alt="The R0 to R6 raster-vector spectrum, with R1 to R3 warped today, R3' modelled, R4 to R6 planned"}
+
+::: {.cards}
+
+::: {.card .featured}
+### [Start here](start.qmd)
+Install the `wxy` command or a container image, warp a COG to the
+Antarctic, then follow a month of real sea surface temperature from
+NOAA's bucket as virtual Zarr.
+:::
+
+::: {.card}
+### [Capability map](capabilities.qmd)
+Which rungs of the ladder are built, which verbs work on each, and what
+each way in (Rust, CLI, Python, R, browser) can do today.
+:::
+
+::: {.card}
+### [How-tos](vignettes/README.md)
+Short answers to questions people ask on forums: a COG in any projection,
+a curvilinear grid to a polar map, values at points, zonal statistics.
+:::
+
+::: {.card}
+### [Explainers](explainers/index.qmd)
+How each GDAL mechanism wxylib ports works, in GDAL and in wxylib, and
+how the two are checked against each other.
+:::
+
+::: {.card}
+### [Live demos](demos.qmd)
+The warper compiled to WebAssembly: a COG or Sentinel-2 scene warped in
+the browser on every pan and zoom.
+:::
+
+::: {.card}
+### [Reference](reference.qmd)
+The crates, the `wxy` command, the Python and R packages, and the
+byte-reference table spec.
+:::
+
+::: {.card}
+### [Design](design/README.md)
+The module survey, the data model, the architecture and staged roadmap,
+related work, and the musings that are not plans yet.
+:::
+
+::: {.card}
+### [Gaps and contributing](contribute.qmd)
+What does not work yet, where help counts most, and how to pin a
+behaviour down with a fixture.
+:::
+
+:::
+
+## Companion reading
+
+wxylib's grid model comes from two of its author's projects:
+[Regular in what?](https://hypertidy.github.io/regular-in-what/), a short
+book on grids, coordinates and the curvilinear confusion, and
+[playproj](https://github.com/hypertidy/playproj), map projections, cells
+and index space drawn the way they are built.

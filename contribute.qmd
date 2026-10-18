@@ -1,0 +1,52 @@
+---
+title: "Gaps and contributing"
+---
+
+## What does not work yet
+
+The [capability map](capabilities.qmd) has the full picture. In short:
+
+- Fitted (R3') grids and meshes (R4, R5) do not warp yet; features (R6)
+  are queries for extraction, not data the model holds.
+- netCDF is read only through a byte-reference table, not directly; CF
+  `grid_mapping` and 1D CF bounds are not read.
+- `wxy-virtual` does not yet handle LZW or predictors, `s3://`
+  references, or tables with several chunks per file.
+- CRS work uses the pure-Rust proj4rs backend: EPSG codes and PROJ
+  strings, no datum grids, no WKT (see [CRS input](crs-input.md)).
+- The Python and R packages warp in-memory arrays only. Nothing is
+  published to crates.io, PyPI or CRAN.
+
+Which stages are planned next, and why, is in design doc 03's
+[stages section](design/docs/03-architecture.md#3-stages).
+
+## Ways to help
+
+- **Contribute a fixture.** A small file plus the GDAL output it should
+  produce is the most useful way to pin a behaviour down. See
+  [wxylib/fixtures](https://github.com/wxylib/fixtures).
+- **Report a GDAL mismatch.** The bar is identity: every warp, point read
+  and polygon case must give GDAL's numbers exactly. A case that does not
+  is a bug in [wxylib/core](https://github.com/wxylib/core/issues).
+- **Question the design.** Each design document ends in a gate, so the
+  open questions are written down. Open an issue on
+  [wxylib/design](https://github.com/wxylib/design/issues).
+- **Write a how-to.** Each one starts from a question asked on a forum or
+  issue tracker and answers it with a command or a live page.
+- **Prefer upstream.** If a fix belongs in async-tiff, zarrs, Icechunk,
+  rwarp or the GeoZarr conventions, it goes there; wxylib keeps only what
+  has no other home.
+
+## Repositories
+
+| Repository | Holds |
+|------------|-------|
+| [design](https://github.com/wxylib/design) | Design documents, roadmap and decisions |
+| [core](https://github.com/wxylib/core) | The Cargo workspace |
+| [fixtures](https://github.com/wxylib/fixtures) | Test files and GDAL oracle outputs |
+| [docs](https://github.com/wxylib/docs) | This site |
+| [py](https://github.com/wxylib/py), [r](https://github.com/wxylib/r) | Early Python and R bindings |
+| [web](https://github.com/wxylib/web) | The browser demos |
+| [images](https://github.com/wxylib/images) | Container images for the CLI, Python and R |
+
+License: MIT OR Apache-2.0.

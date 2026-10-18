@@ -1,0 +1,4 @@
+/_site/
+/.quarto/
+# wxylib/design, checked out here by the publish workflow
+/design/

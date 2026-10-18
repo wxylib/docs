@@ -1,0 +1,13 @@
+---
+title: "Capability map"
+subtitle: "What is built on each rung of the ladder, and through which way in"
+toc: false
+page-layout: full
+---
+
+Read from wxylib/core at `3abd248` (2026-10-18). The map is a static page
+for now; [open it on its own](capabilities/map.html).
+
+```{=html}
+<iframe class="capmap" src="capabilities/map.html" title="wxylib capability map" loading="lazy"></iframe>
+```
