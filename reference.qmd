@@ -8,7 +8,7 @@ drift.
 
 | Surface | Reference | State |
 |---------|-----------|-------|
-| Rust crates | rustdoc (`cargo doc`), at wxylib.github.io/core | Not published yet; the crate-level docs in each `lib.rs` are already written |
+| Rust crates | [rustdoc for all crates](https://wxylib.github.io/core/) | Published from core's CI on each push to main |
 | `wxy` command | [Command reference](reference/cli.qmd), generated from `wxy --help` | Rebuilt from core's main on every publish |
 | R package `wxy` | pkgdown, at wxylib.github.io/r | Not yet; three functions |
 | Python package `wxy` | quartodoc, rendered into this site | Not yet; three functions |

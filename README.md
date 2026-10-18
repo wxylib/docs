@@ -17,7 +17,8 @@ GDAL is the inspiration and, for now, the test oracle.
 Every page is markdown and reads here too:
 
 - [Start here](start.qmd): run `wxy` from a container or build it.
-- [Capability map](capabilities/map.html) (open the rendered site to view it).
+- Capability map: the data is [capabilities/capabilities.yml](capabilities/capabilities.yml);
+  open the rendered site to view the page.
 - [How-tos](vignettes/README.md), starting from the
   [OISST walk-through](oisst-virtual.md).
 - [Explainers](explainers/index.qmd): how each ported GDAL mechanism works
@@ -32,8 +33,15 @@ are pulled in from wxylib/design at build time, so they have one copy.
 
 ```sh
 git clone https://github.com/wxylib/design   # into this directory, as design/
+git clone https://github.com/wxylib/core     # optional, as core/: live counts on the capability map
+python3 -m pip install pyyaml                # for capabilities/build.py
+python3 capabilities/build.py                # once, before the first render
 quarto preview
 ```
+
+The capability map is generated from
+[capabilities/capabilities.yml](capabilities/capabilities.yml) before each
+render; a status change is a one-line edit there.
 
 `.github/workflows/publish.yml` renders on every pull request and
 publishes from main.

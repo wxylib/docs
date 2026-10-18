@@ -1,0 +1,249 @@
+# The capability map, as data. capabilities/build.py renders it into the
+# Capabilities page at every site build, so an update is an edit here.
+#
+# A cell is [status, "text"]. Status is one of:
+#   built    built and GDAL-checked
+#   partial  built with known gaps
+#   planned  planned in a numbered stage
+#   asp      type slot or aspiration
+#   none     not there yet
+#   na       does not apply
+# Text is plain ASCII with `code` and [links](url). A row can give
+# `span: [status, "text"]` instead of per-column cells to cover them all.
+#
+# When a stage lands: change the cells it moves, then set `reviewed.core`
+# to the core commit you read. The build compares that against wxylib/core
+# main (when checked out into core/) and says on the page if core has
+# moved on since.
+
+reviewed:
+  core: 3abd248
+  date: 2026-10-18
+  py_pin: 39b07bb
+  r_pin: 39b07bb
+
+summary: >-
+  The structured half of the ladder (R0 to R3) is built end to end and
+  matches GDAL 3.12 on every fixture. R6 features are in as *inputs* to
+  extraction, not yet as data the model holds. R3', R4 and R5 exist only
+  as type slots. The full API lives in Rust and the CLI; Python and R bind
+  three in-memory functions, and the browser binds COG warping.
+
+# Used when core/ is not checked out; the build counts these from the
+# source when it is.
+facts:
+  crates: 10
+  lines: 10.7k
+  tests: 62
+  verbs: [warp, points, zonal]
+
+# The ladder figure. Order and ids are fixed by ladder.svg.in; status
+# colours the glyph and pill.
+rungs:
+  - {id: R0,  name: index only,    status: built,   pill: built}
+  - {id: R1,  name: regular,       status: built,   pill: built}
+  - {id: R2,  name: rectilinear,   status: built,   pill: built}
+  - {id: R3,  name: curvilinear,   status: partial, pill: "built, gaps"}
+  - {id: R3f, name: fitted,        status: asp,     pill: type slot only, label: "R3'"}
+  - {id: R4,  name: implicit mesh, status: asp,     pill: type slot only}
+  - {id: R5,  name: explicit mesh, status: planned, pill: staged (S8)}
+  - {id: R6,  name: features,      status: partial, pill: as queries}
+
+# Arrows under the ladder: conversions to R1 that run today.
+# status is built or partial.
+conversions:
+  - {from: R2, status: built,   label: normalise}
+  - {from: R3, status: partial, label: "R3 to R1 in another frame (a test; not automatic)"}
+  - {from: R6, status: built,   label: "rasterize, or exact coverage: features to R1 cells"}
+
+ladder_caption: >-
+  Each rung stores strictly more than the one before (design doc 02,
+  section 3). Every `Positions` variant in `wxy-domain` exists, so types
+  will not change when rungs arrive; only R0 to R3 evaluate positions.
+  Arrows are the conversions that run today.
+
+rung_by_verb:
+  intro: >-
+    Rows are rungs; columns are the things the library does. The warp,
+    points and zonal columns all go through one plan seam in `wxy-warp`,
+    so a rung that warps also extracts.
+  columns:
+    model: Model
+    read: Read
+    normalise: Normalise
+    warp: Warp from
+    points: Points
+    zonal: Zonal / burn
+    write: Write
+    refs: Virtual refs
+  rows:
+    R0:
+      model: [built, "`IndexOnly`"]
+      read: [built, "unmapped dims (TIFF band, any Zarr dim)"]
+      normalise: [na, "n/a"]
+      warp: [na, "needs a CRS frame"]
+      points: [na, "n/a"]
+      zonal: [na, "n/a"]
+      write: [built, "leading 1D coords copied byte for byte"]
+      refs: [built, "arrays referenced whatever their georef"]
+    R1:
+      model: [built, "`Affine`, `Regular1`"]
+      read: [built, "tiled GeoTIFF/COG, chunky or planar, overviews; Zarr with GeoZarr `spatial:`/`proj:`"]
+      normalise: [na, "target of normalisation"]
+      warp: [built, "chunked like gdalwarp, scaled kernels, `-ovr auto`, `-wm`, globe wrap, extra dims streamed"]
+      points: [built, "near, bilinear, cubic, cubicspline"]
+      zonal: [built, "centre, all-touched, exact coverage"]
+      write: [built, "GeoZarr grid, windowed writer"]
+      refs: [partial, "TIFF scan (no LZW, no predictor); mdim-refs table to Icechunk"]
+    R2:
+      model: [built, "`Rectilinear`"]
+      read: [built, "CF 1D coordinate arrays in Zarr"]
+      normalise: [built, "to R1 within float32/f64/absolute tolerance, also through a frame (Mercator y), with a report"]
+      warp: [built, "as R1 when regular, else expanded to geolocation"]
+      points: [built, "same path as warp"]
+      zonal: [built, "same path as warp"]
+      write: [none, "writes an affine only"]
+      refs: [partial, "inline coords from mdim-refs"]
+    R3:
+      model: [built, "`Curvilinear`, centre or edge"]
+      read: [partial, "CF 2D lon/lat in Zarr, bounds as edges; no netCDF, no 1D CF bounds, no `grid_mapping`"]
+      normalise: [partial, "R3 to R1 in another frame: test exists, caller supplies the projection"]
+      warp: [built, "GDAL geolocation-array parity, swaths and polar grids"]
+      points: [built, "inverse of the geolocation arrays"]
+      zonal: [built, "index-space areas"]
+      write: [none, "not yet"]
+      refs: [none, "not yet"]
+    R3f:
+      model: [asp, "`FittedModel` trait"]
+      read: [none, "no GCP, RPC or TPS reader"]
+      normalise: [na, "n/a"]
+      warp: [none, "rejected as unsupported"]
+      points: [none, ""]
+      zonal: [none, ""]
+      write: [none, ""]
+      refs: [none, ""]
+    R4:
+      model: [asp, "`CellScheme` trait (centre from id)"]
+      span: [asp, "DGGS and L3 bins sit under the mesh umbrella, \"a home in time, not day 1\". No stage yet."]
+    R5:
+      model: [asp, "`Elements` trait, opaque"]
+      span: [planned, "S8: meshspec v0.1, UGRID through existing readers, conversion first; topology module and overlay after."]
+    R6:
+      model: [asp, "`Elements` trait; GeoArrow chosen, not wired"]
+      read: [partial, "CLI parses GeoJSON polygons and x,y points; not a `Collection`"]
+      normalise: [na, "n/a"]
+      warp: [na, "n/a"]
+      points: [built, "points are the query"]
+      zonal: [built, "polygons are the zones (controlledburn for coverage)"]
+      write: [none, "CSV results only"]
+      refs: [planned, "S7 scheme covers features"]
+
+api_surface:
+  intro: >-
+    What each way in can do today. Python and R are spikes pinned to core
+    `$py_pin` (S5), so they predate mdim streaming, curvilinear warp,
+    extraction and plans.
+  columns:
+    rust: Rust crates
+    cli: "`wxy` CLI"
+    py: Python (pyo3)
+    r: R (extendr)
+    web: Browser (wasm)
+  # Columns left out of a row are [none, ""].
+  rows:
+    - name: Open GeoTIFF / COG
+      rust: [built, "`wxy-tiff`: path, any `object_store`"]
+      cli: [built, "local file"]
+      web: [built, "HTTP range requests"]
+    - name: Open Zarr
+      rust: [built, "`wxy-zarr` via zarrs, v2/v3, sharding"]
+      cli: [built, "store directory, `--array`"]
+      web: [none, "`Send`/`Sync` bound blocks wasm"]
+    - name: Domain model, R2 to R1 test
+      rust: [built, "`wxy-domain`, `normalise`"]
+      py: [built, "`affine`, `regular`"]
+      r: [built, "`wxy_affine`, `wxy_regular`"]
+    - name: Warp to a grid
+      rust: [built, "`wxy-warp`: `plan`, `warp`, `WarpPlan`, `warp_pyramid`"]
+      cli: [built, "`wxy warp` to GeoZarr"]
+      py: [partial, "2D array in, array out, affine source only"]
+      r: [partial, "same as Python"]
+      web: [built, "COG to the canvas, per view"]
+    - name: Multidim streaming
+      rust: [built, "leading dims batched under one plan"]
+      cli: [built, "time/depth coords copied"]
+    - name: Curvilinear warp
+      rust: [built, "`geoloc`, centres or edges"]
+      cli: [built, "`--bounds`"]
+    - name: Points, zonal
+      rust: [built, "`extract_points`, `zonal_stats`"]
+      cli: [built, "`wxy points`, `wxy zonal --coverage`"]
+    - name: Plans as values
+      rust: [built, "`Explain`, serde options"]
+      cli: [built, "`--dry-run` JSON"]
+    - name: Write GeoZarr
+      rust: [built, "`GridWriter`, `wxy-geozarr` standalone"]
+      cli: [built, "warp output"]
+      web: [na, "n/a"]
+    - name: Virtual references
+      rust: [partial, "`scan_tiff`, `from_refs_table`, Icechunk write/read"]
+      cli: [none, "example only"]
+    - name: Byte-range cache
+      rust: [built, "`wxy-cache`, Parquet rows"]
+      cli: [partial, "`--cache`, GeoTIFF only"]
+    - name: CRS input
+      span: [partial, "Pure Rust proj4rs everywhere: EPSG codes and PROJ strings, no WKT or PROJJSON. `wxy warp --crs` takes EPSG only, since GeoZarr `proj:` has nowhere to record a PROJ string. Real PROJ is the open question ([rust-proj-capability](https://github.com/mdsumner/rust-proj-capability)); proj4rs lacks polar LAEA and AEQD. See [Which CRS strings work where](crs-input.md)."]
+    - name: Packaging
+      span: [partial, "Docker images for the CLI, Python and R ([wxylib/images](https://github.com/wxylib/images)). No crates.io release yet by choice; rwarp is a git dependency. CI on Ubuntu only."]
+    - name: Shared layers
+      span: [asp, "C ABI (`wxy-ffi`) and Arrow interchange are the intended base for Julia, DuckDB, Go and JS hosts. Neither exists yet."]
+
+# Cards under "Potential". body is a paragraph, or items is a list.
+potential:
+  - tag: "S3c, parked on m06 questions"
+    title: Flat refs store
+    body: >-
+      A zarrs storage over the mdim-refs Parquet export. Virtual data reads
+      without writing an Icechunk repo first, plans report real stored
+      bytes, and the cache sees every virtual read. It is also the cheapest
+      route to bindings, since a table is all a host needs to hand over.
+  - tag: "S6, spikes exist"
+    title: Bindings of the real surface
+    body: >-
+      Python and R move from in-memory functions to `open`, `warp`,
+      `points`, `zonal` and `explain` on files and stores. Most of the work
+      is a repin and a thin layer, because plans and options already
+      serialise.
+  - tag: S7
+    title: The virtual scheme
+    body: >-
+      Select, remap, combine and compute, serialised and written by the
+      library: the VRT replacement, mosaics with gdalbuildvrt-style
+      validation, and the place features and meshes join grids.
+  - tag: S8 and later
+    title: Mesh half of the ladder
+    items:
+      - R5 explicit meshes via UGRID, conversion first.
+      - R6 as GeoArrow inside the model, so features are data and not only queries.
+      - R4 schemes (HEALPix, H3, L3 bins) as a `CellScheme`.
+  - tag: R1 to R3 gaps (m07)
+    title: Index-space depth
+    items:
+      - CF `grid_mapping`, so rotated-pole and geos read in their frame.
+      - Periodic and folded dims; cubed-sphere patches.
+      - Vertical `formula_terms` as R3' with field terms.
+      - netCDF input, 1D CF bounds, NaN in geolocation.
+  - tag: cross-cutting
+    title: The `transform` verb and PROJ
+    body: >-
+      `transform` (positions on every rung) is decided but not built; today
+      positions only move inside warp and extraction. A PROJ-backed frame
+      would lift the EPSG-only limit, WKT and PROJJSON with it, and the
+      missing projections.
+
+footnote: >-
+  Statuses are a reading of the source of wxylib/core, py, r and web on
+  their default branches, and design docs 02, 03 and m07; the test suite
+  was not rerun for this page. "GDAL-checked" means the crate's tests
+  compare against outputs in [wxylib/fixtures](https://github.com/wxylib/fixtures)
+  made with GDAL 3.12.

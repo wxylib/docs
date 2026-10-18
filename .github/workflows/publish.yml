@@ -1,10 +1,11 @@
 # Render the Quarto site (this repository plus wxylib/design, checked out
-# into design/) and publish it to GitHub Pages from main. Pull requests
-# render too, so a broken page fails the check, and the rendered site is
-# attached to the run as an artifact. The wxy command reference is
-# regenerated from wxylib/core's main on every run, and a daily run keeps
-# it current when only core has changed. Needs Pages turned on with "GitHub
-# Actions" as the source (Settings, Pages).
+# into design/, and wxylib/core in core/ for the capability map's counts)
+# and publish it to GitHub Pages from main. Pull requests render too, so
+# a broken page (or a bad capabilities.yml) fails the check, and the
+# rendered site is attached to the run as an artifact. The wxy command
+# reference is regenerated from core's main on every run, and a daily run
+# keeps it current when only core has changed. Needs Pages turned on
+# with "GitHub Actions" as the source (Settings, Pages).
 name: publish
 
 on:
@@ -31,19 +32,28 @@ jobs:
         with:
           repository: wxylib/design
           path: design
-      # A dot directory, so Quarto never treats it as site content
       - uses: actions/checkout@v4
         with:
           repository: wxylib/core
-          path: .wxy-core
+          path: core
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the capability map's one dependency
+        run: python -m pip install pyyaml
+      # Quarto resolves includes before its pre-render step runs, so the
+      # generated page must exist first.
+      - name: Build the capability map
+        run: python capabilities/build.py
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: .wxy-core
+          workspaces: core
       - name: Command reference from wxy --help
         run: |
-          cargo build --manifest-path .wxy-core/Cargo.toml -p wxy-cli
-          python3 reference/gen-cli.py .wxy-core/target/debug/wxy "$(git -C .wxy-core rev-parse HEAD)"
+          cargo build --manifest-path core/Cargo.toml -p wxy-cli
+          python reference/gen-cli.py core/target/debug/wxy "$(git -C core rev-parse HEAD)"
       - uses: quarto-dev/quarto-actions/setup@v2
       - name: Render
         run: quarto render
