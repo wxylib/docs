@@ -9,6 +9,7 @@ project:
     - capabilities.qmd
     - demos.qmd
     - reference.qmd
+    - reference/cli.qmd
     - contribute.qmd
     - oisst-virtual.md
     - crs-input.md
