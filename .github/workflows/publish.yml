@@ -1,7 +1,9 @@
 # Render the Quarto site (this repository plus wxylib/design, checked out
 # into design/) and publish it to GitHub Pages from main. Pull requests
 # render too, so a broken page fails the check, and the rendered site is
-# attached to the run as an artifact. Needs Pages turned on with "GitHub
+# attached to the run as an artifact. The wxy command reference is
+# regenerated from wxylib/core's main on every run, and a daily run keeps
+# it current when only core has changed. Needs Pages turned on with "GitHub
 # Actions" as the source (Settings, Pages).
 name: publish
 
@@ -9,6 +11,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -27,6 +31,19 @@ jobs:
         with:
           repository: wxylib/design
           path: design
+      # A dot directory, so Quarto never treats it as site content
+      - uses: actions/checkout@v4
+        with:
+          repository: wxylib/core
+          path: .wxy-core
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: .wxy-core
+      - name: Command reference from wxy --help
+        run: |
+          cargo build --manifest-path .wxy-core/Cargo.toml -p wxy-cli
+          python3 reference/gen-cli.py .wxy-core/target/debug/wxy "$(git -C .wxy-core rev-parse HEAD)"
       - uses: quarto-dev/quarto-actions/setup@v2
       - name: Render
         run: quarto render
