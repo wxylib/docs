@@ -1,0 +1,49 @@
+# Render the Quarto site (this repository plus wxylib/design, checked out
+# into design/) and publish it to GitHub Pages from main. Pull requests
+# render too, so a broken page fails the check, and the rendered site is
+# attached to the run as an artifact. Needs Pages turned on with "GitHub
+# Actions" as the source (Settings, Pages).
+name: publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: wxylib/design
+          path: design
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - name: Render
+        run: quarto render
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: render
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

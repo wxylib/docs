@@ -1,0 +1,33 @@
+---
+title: "What the tests check"
+---
+
+The tests use GDAL as an oracle. Small synthetic files and GDAL's output for
+them live in [wxylib/fixtures](https://github.com/wxylib/fixtures), made by
+scripts there with GDAL and zarr-python.
+
+- **Reads** (`wxy-tiff`, `wxy-zarr`, `wxy-virtual`): every window must match
+  what GDAL reads, byte for byte, across five GeoTIFFs (int16, uint8,
+  uint16, float32; DEFLATE, ZSTD, LZW with predictor; COG and plain; pixel
+  and band interleaved; BigTIFF), three of them converted to Zarr, and a
+  byte-reference table over three netCDF4 files (one chunk missing on
+  purpose, which must read as fill).
+- **Warps** (`wxy-warp`, `wxy-cli`): three source/target pairs (global to
+  Antarctic polar stereographic, polar to lon/lat, UTM to lon/lat) with
+  nearest, bilinear and cubic, at 1:1 and coarser, compared with what
+  GDAL's warper writes; curvilinear swaths placed by cell centres or
+  corners, against GDAL's geolocation-array warp; and an OISST-style 4D
+  store as xarray writes it, day by day.
+- **Extraction** (`wxy-warp`): values at random points, by cell and
+  interpolated, against GDAL's point reads; and the cells under random
+  polygons with holes, by cell centre and all-touched, against GDAL's
+  rasterizer.
+- **Model** (`wxy-domain`, `wxy-geozarr`): unit tests, including real-world
+  grid cases from regular-in-what (a float32 GHRSST axis, AVISO's Mercator
+  latitude, NSIDC polar stereographic).
+
+The bar is identity: every warp, point read and polygon case must give
+GDAL's numbers exactly, cell for cell.
+
+CI runs `cargo test --workspace` against the fixtures on every push and pull
+request to core.

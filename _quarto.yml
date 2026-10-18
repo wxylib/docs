@@ -1,0 +1,138 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - start.qmd
+    - capabilities.qmd
+    - demos.qmd
+    - reference.qmd
+    - contribute.qmd
+    - oisst-virtual.md
+    - crs-input.md
+    - vignettes/README.md
+    - vignettes/browser/README.md
+    - vignettes/curvilinear/README.md
+    - vignettes/points/README.md
+    - examples/zonal/README.md
+    - explainers/*.qmd
+    - explainers/*.md
+    # wxylib/design, checked out here by the publish workflow
+    - design/README.md
+    - design/docs/*.md
+    - design/specs/*.md
+  resources:
+    - capabilities/map.html
+
+website:
+  title: "wxylib"
+  description: "GDAL's modular ideas as small Rust crates, checked against GDAL."
+  site-url: https://wxylib.github.io/docs/
+  repo-url: https://github.com/wxylib/docs
+  repo-actions: [edit, issue]
+  search: true
+  page-navigation: true
+  navbar:
+    left:
+      - text: Start
+        href: start.qmd
+      - text: Capabilities
+        href: capabilities.qmd
+      - text: How-tos
+        href: vignettes/README.md
+      - text: Explainers
+        href: explainers/index.qmd
+      - text: Demos
+        href: demos.qmd
+      - text: Reference
+        href: reference.qmd
+      - text: Design
+        href: design/README.md
+      - text: Contribute
+        href: contribute.qmd
+    right:
+      - icon: github
+        href: https://github.com/wxylib
+  sidebar:
+    - title: "How-tos"
+      contents:
+        - text: "All how-tos"
+          href: vignettes/README.md
+        - text: "A COG in any projection, in the browser"
+          href: vignettes/browser/README.md
+        - text: "A curvilinear grid to a polar map"
+          href: vignettes/curvilinear/README.md
+        - text: "Values at points"
+          href: vignettes/points/README.md
+        - text: "Zonal statistics by lazy rasterization"
+          href: examples/zonal/README.md
+        - text: "A month of OISST as virtual Zarr"
+          href: oisst-virtual.md
+        - text: "Which CRS strings work where"
+          href: crs-input.md
+    - title: "Explainers"
+      contents:
+        - explainers/index.qmd
+        - text: "How the warper works"
+          href: explainers/warper.md
+        - text: "Resampling kernels"
+          href: explainers/kernels.md
+        - text: "Curvilinear grids"
+          href: explainers/geoloc.md
+        - text: "Values at points"
+          href: explainers/points.md
+        - text: "Polygons to cells"
+          href: explainers/rasterize.md
+        - text: "Overview selection"
+          href: explainers/overviews.md
+        - explainers/testing.qmd
+    - title: "Design"
+      contents:
+        - text: "Design overview"
+          href: design/README.md
+        - section: "Numbered documents"
+          contents:
+            - text: "01 Module survey"
+              href: design/docs/01-module-survey.md
+            - text: "02 Data model"
+              href: design/docs/02-data-model.md
+            - text: "03 Architecture and stages"
+              href: design/docs/03-architecture.md
+            - text: "04 Landscape"
+              href: design/docs/04-landscape.md
+            - text: "05 Pain points"
+              href: design/docs/05-pain-points.md
+        - section: "Musings"
+          contents:
+            - text: "m01 Downstream UX"
+              href: design/docs/m01-downstream-ux.md
+            - text: "m02 Byte-reference pilot"
+              href: design/docs/m02-pilot-mdimrefs.md
+            - text: "m03 Presentation and map format"
+              href: design/docs/m03-presentation-and-map-format.md
+            - text: "m04 Lofty goals reassessed"
+              href: design/docs/m04-lofty-goals-reassessed.md
+            - text: "m05 Chunk cache"
+              href: design/docs/m05-chunk-cache.md
+            - text: "m06 Foundation assessment response"
+              href: design/docs/m06-foundation-assessment-response.md
+            - text: "m07 Index space"
+              href: design/docs/m07-index-space.md
+        - section: "Specs"
+          contents:
+            - text: "mdim-refs 0.2"
+              href: design/specs/mdim-refs-0.2.md
+  page-footer:
+    left: "wxylib: MIT OR Apache-2.0"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    respect-user-color-scheme: true
+    css: styles.css
+    toc: true
+    code-copy: true
+    highlight-style: a11y

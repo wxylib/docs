@@ -1,0 +1,26 @@
+---
+title: "Explainers"
+---
+
+How each GDAL mechanism that wxylib ports works, in GDAL and in wxylib,
+and how the two are checked against each other. Each has one figure, made
+by the script beside it.
+
+- [How the warper works](warper.md): chunks, source windows and kernel
+  scale, and why they change the values a warp writes.
+- [Resampling kernels](kernels.md): bilinear and cubic weights, how they
+  stretch for a coarser target, edges, nodata and the arithmetic order
+  that decides the last digit.
+- [Curvilinear grids](geoloc.md): GDAL's geolocation-array transformer,
+  the backmap and the search that turns a position back into a cell of a
+  swath.
+- [Values at points](points.md): gdallocationinfo's cell and
+  InterpolateAtPoint's kernels, how they differ from a warp's, and reads
+  planned so each chunk is fetched once.
+- [Polygons to cells](rasterize.md): GDAL's rasterizer by cell centre and
+  ALL_TOUCHED, what happens to a polygon before the burn, and coverage
+  fractions.
+- [Overview selection](overviews.md): gdalwarp's `-ovr AUTO` rule for
+  which resolution level a warp reads, checked against gdalwarp itself.
+- [What the tests check](testing.qmd): GDAL as the oracle, and the bar of
+  identity.
