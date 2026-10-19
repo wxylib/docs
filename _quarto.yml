@@ -24,6 +24,7 @@ project:
     - design/README.md
     - design/docs/*.md
     - design/specs/*.md
+    - design/measurements/*/README.md
 
 website:
   title: "wxylib"
@@ -103,6 +104,8 @@ website:
               href: design/docs/04-landscape.md
             - text: "05 Pain points"
               href: design/docs/05-pain-points.md
+            - text: "Commit criteria"
+              href: design/docs/commit-criteria.md
         - section: "Musings"
           contents:
             - text: "m01 Downstream UX"
@@ -119,10 +122,20 @@ website:
               href: design/docs/m06-foundation-assessment-response.md
             - text: "m07 Index space"
               href: design/docs/m07-index-space.md
+            - text: "m08 Point clouds"
+              href: design/docs/m08-point-clouds.md
+            - text: "m09 Missing modules"
+              href: design/docs/m09-missing-modules.md
+            - text: "m10 Overlapping COG mosaics"
+              href: design/docs/m10-overlapping-mosaics.md
+            - text: "m11 Quiet operations"
+              href: design/docs/m11-quiet-operations.md
         - section: "Specs"
           contents:
             - text: "mdim-refs 0.2"
               href: design/specs/mdim-refs-0.2.md
+            - text: "COP30 source table"
+              href: design/measurements/cop30/README.md
   page-footer:
     left: "wxylib: MIT OR Apache-2.0"
     right: "Built with [Quarto](https://quarto.org)"
