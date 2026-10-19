@@ -1,6 +1,6 @@
 # wxylib/docs
 
-The source of the wxylib site, **https://wxylib.github.io/docs/**: one
+The source of the wxylib site, **https://wxylib.org/docs/**: one
 place for what wxylib is, what works, how-tos, explainers, the design
 documents and how to help.
 

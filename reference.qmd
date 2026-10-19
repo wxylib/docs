@@ -8,9 +8,9 @@ drift.
 
 | Surface | Reference | State |
 |---------|-----------|-------|
-| Rust crates | [rustdoc for all crates](https://wxylib.github.io/core/) | Published from core's CI on each push to main |
+| Rust crates | [rustdoc for all crates](https://wxylib.org/core/) | Published from core's CI on each push to main |
 | `wxy` command | [Command reference](reference/cli.qmd), generated from `wxy --help` | Rebuilt from core's main on every publish |
-| R package `wxy` | pkgdown, at wxylib.github.io/r | Not yet; three functions |
+| R package `wxy` | pkgdown, at wxylib.org/r | Not yet; three functions |
 | Python package `wxy` | quartodoc, rendered into this site | Not yet; three functions |
 | Browser module | The [web README](https://github.com/wxylib/web#readme) | |
 | Byte-reference tables | [mdim-refs 0.2 spec](design/specs/mdim-refs-0.2.md) | Reference spec from adjacent work |
