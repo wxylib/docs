@@ -18,6 +18,7 @@ project:
     - vignettes/curvilinear/README.md
     - vignettes/points/README.md
     - examples/zonal/README.md
+    - examples/nonaffine/README.md
     - explainers/*.qmd
     - explainers/*.md
     # wxylib/design, checked out here by the publish workflow
@@ -68,6 +69,8 @@ website:
           href: vignettes/points/README.md
         - text: "Zonal statistics by lazy rasterization"
           href: examples/zonal/README.md
+        - text: "Polygons on grids that are not a regular lattice"
+          href: examples/nonaffine/README.md
         - text: "A month of OISST as virtual Zarr"
           href: oisst-virtual.md
         - text: "Which CRS strings work where"

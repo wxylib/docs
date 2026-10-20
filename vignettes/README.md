@@ -11,6 +11,7 @@ open, and says plainly where it stops.
 | [A curvilinear grid with a time axis, to a polar map](curvilinear/README.md) | 2D lon/lat netCDF-style data onto a regular grid, all time steps at once ([stars #618](https://github.com/r-spatial/stars/issues/618), [Scientific Python](https://discuss.scientific-python.org/t/reprojecting-a-netcdf-file-from-curvilinear-to-regular-lat-lon-grid-in-python/1815)) | `python run.py` |
 | [Values at points: which method did you use?](points/README.md) | Nearest versus interpolated sampling, and what it costs ([raster_sampling](https://github.com/uw-cryo/raster_sampling)) | `python run.py` |
 | [Zonal statistics by lazy rasterization](../examples/zonal/README.md) | Zonal stats of a large raster over many polygons without running out of memory ([Pangeo](https://discourse.pangeo.io/t/advice-for-scalable-raster-vector-extraction/4129)) | `python bench.py` |
+| [Polygons on grids that are not a regular lattice](../examples/nonaffine/README.md) | Coverage fractions on rotated, rectilinear and curvilinear grids: move the polygon to index space, or the cells to the polygon? | `python plot.py` |
 
 The scripts need the `wxy` binary from [wxylib/core](https://github.com/wxylib/core)
 (`cargo build --release -p wxy-cli`, then point `WXY` at
