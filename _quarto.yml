@@ -3,6 +3,8 @@ project:
   output-dir: _site
   # Writes capabilities/_generated.md from capabilities/capabilities.yml.
   pre-render: capabilities/build.py
+  # Edit and issue links on pages from wxylib/design and wxylib/core.
+  post-render: repo-links.py
   render:
     - index.qmd
     - start.qmd
