@@ -1,0 +1,11 @@
+case,polygon,cells,max_diff_world,max_diff_dense,max_diff_index
+rotated,0,147,1.79e-13,2.82e-08,2.82e-08
+rotated,1,71,1.97e-13,2.96e-08,2.96e-08
+rect-edges,0,164,1.38e-13,2.54e-05,8.25e-01
+rect-edges,1,92,2.21e-13,5.10e-05,1.00e+00
+rect-centres,0,162,7.41e-14,3.49e-02,7.93e-01
+rect-centres,1,93,7.53e-14,3.85e-02,1.00e+00
+fan-centres,0,93,7.19e-14,7.45e-03,3.06e-01
+fan-centres,1,90,3.38e-14,1.47e-02,9.96e-01
+fan-edges,0,93,3.42e-14,7.45e-03,3.06e-01
+fan-edges,1,90,2.88e-14,1.47e-02,9.95e-01
