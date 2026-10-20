@@ -124,6 +124,79 @@ the rotated grid the two agree cell for cell. On the others, with
 vertices moved one at a time, the sliver gains and loses dozens of cells,
 for the same reason as the coverage above.
 
+## Prior art: ESMF and friends
+
+Coverage on curvilinear grids is old ground in Earth system modelling,
+always from the world-space side. The index-space burn has no
+counterpart there.
+
+- **ESMF conservative regridding** (and SCRIP before it) intersects source
+  and destination cells in world space. Its cells come from **corner
+  coordinates** (CF `bounds`, the grid's corner stagger), which
+  conservative regridding requires. Corners are joined by great circles
+  on the sphere (the default for conservative methods) or by straight
+  lines (`line_type` cartesian). The work is done in 3D Cartesian space,
+  which avoids trouble at the poles and the antimeridian. Its source
+  fraction field (`frac_a`) is the fraction of each source cell that
+  takes part, which is the coverage fraction used here.
+- **xESMF's `SpatialAverager`** applies this to polygons. Each polygon
+  becomes an ESMF mesh, and the result is conservative weights from cells
+  to polygons. ESMF meshes have no holes, so holes and parts are weighted
+  separately and combined, as the signed ring sums do here. The docs
+  advise densifying polygon edges to about 1 degree, for the same reason
+  edges are cut here: an edge's path depends on the edge model.
+- **xagg** builds a polygon for each grid cell and overlays it with the
+  input polygons (geopandas). That is the world-space clip in the planar
+  edge model, for rectangular grids.
+- **regionmask** gives approximate fractional masks (to about 5 percent),
+  on equally spaced grids only.
+- **exactextract** (and controlledburn) burns on a regular lattice:
+  exact, fast, and the engine of the index-space method here.
+
+### ESMF as a second oracle
+
+`esmf_oracle.py` runs ESMF's conservative regridding (esmpy 8.9) with the
+grid as the source and each polygon ring as a destination mesh. The cell
+corners come from the cell outlines and are joined by straight lines
+(cartesian), so the edge model matches this page. `esmf.csv` has the
+largest difference per case:
+
+| case | world-space clip vs ESMF | index, densified, vs ESMF |
+|---|---|---|
+| rotated affine | 3e-13 | 3e-8 |
+| rectilinear, walls given | 2e-13 | 5e-5 |
+| rectilinear, centres given | 1e-13 | 0.039 |
+| curvilinear sector, centres given | 0.0075 | 0.012 |
+| curvilinear sector, corners given | 4e-14 | 0.015 |
+
+ESMF and the world-space clip agree to rounding everywhere except one
+case: a curvilinear grid given by centres. That difference is in the
+definition of a cell, not the arithmetic. ESMF's cell is four corners
+joined by straight lines. Here, a cell from centres follows the bilinear
+interpolation of the centres, so each side bends at its midpoint (see
+[What a cell is](#what-a-cell-is)). The corners themselves are the same
+(each is the mean of the four centres around it). For a rectilinear grid
+the side midpoints lie on the straight sides, so the two definitions
+agree.
+
+So there are three choices to state with any coverage fraction on a
+non-affine grid:
+
+1. **The cell**: corners given (CF bounds), or derived from centres, and
+   then with straight sides (ESMF, CF bounds) or following the
+   interpolation (GDAL's geolocation arrays).
+2. **The edge model**: straight lines in the grid's CRS, straight lines in
+   3D, or great circles. Polygon edges and cell sides can differ.
+3. **The measure**: area (world-space clip, ESMF) or index space
+   (the burn). These agree only where the grid is affine within each
+   cell.
+
+Corners given and straight lines in the CRS reproduce ESMF's cartesian
+results. Great-circle cells, as ESMF uses by default for lon/lat grids,
+would be a different edge model again. A great circle between two
+corners at the same latitude bows towards the pole, away from the line of
+constant latitude, most for wide cells at high latitudes.
+
 ## What this suggests
 
 - **Rotated affine needs nothing new.** Move the polygon with the
@@ -153,6 +226,9 @@ cargo run --release -p wxy-warp --example nonaffine_cover -- nonaffine.json
 
 # here, with osgeo.gdal and matplotlib
 python3 plot.py nonaffine.json
+
+# and with esmpy (conda-forge); ESMF writes a log file to the working directory
+python3 esmf_oracle.py nonaffine.json > esmf.csv
 ```
 
 The grids and polygons are defined in

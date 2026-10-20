@@ -1,0 +1,11 @@
+case,polygon,max_diff_world_vs_esmf,max_diff_dense_vs_esmf
+rotated,0,2.68e-13,2.82e-08
+rotated,1,2.38e-13,2.96e-08
+rect-edges,0,1.12e-13,2.54e-05
+rect-edges,1,2.40e-13,5.10e-05
+rect-centres,0,1.32e-13,3.49e-02
+rect-centres,1,8.59e-14,3.85e-02
+fan-centres,0,7.48e-03,5.32e-03
+fan-centres,1,5.15e-03,1.18e-02
+fan-edges,0,4.02e-14,7.45e-03
+fan-edges,1,4.29e-14,1.47e-02
