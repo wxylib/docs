@@ -200,7 +200,7 @@ api_surface:
 
 # Cards under "Potential". body is a paragraph, or items is a list.
 potential:
-  - tag: "S3c, parked on m06 questions"
+  - tag: "S3c, first slice in core"
     title: Flat refs store
     body: >-
       A zarrs storage over the mdim-refs Parquet export. Virtual data reads
