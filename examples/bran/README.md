@@ -130,3 +130,79 @@ click for a year at one place. `?at=152,-34` opens the series above.
   time-series use.
 - The chunk sizes are data in their own right: land masks, information
   density with depth, and a cost model for any plan.
+
+## 5. Other margins
+
+Sections 2 to 4 each hold two dimensions and draw the other two. The
+array has four dimensions (time, depth, latitude, longitude), so there
+are six such planes, and the table prices every one of them before any
+data is read. Holding the others at the first day, the surface, or the
+EAC cell of section 4:
+
+| Plane drawn | Chunks | MB fetched | Values kept | Kept, % of decoded |
+|---|---:|---:|---:|---:|
+| latitude x longitude | 60 | 3.8 | 5,400,000 | 100 |
+| depth x latitude | 255 | 18.4 | 76,500 | 0.33 |
+| depth x longitude | 612 | 46.1 | 183,600 | 0.33 |
+| time x latitude | 1,825 | 134.8 | 547,500 | 0.33 |
+| time x longitude | 4,380 | 336.3 (263.1 along the equator) | 1,314,000 | 0.33 |
+| time x depth | 18,615 | 1,477.4 | 18,615 | 0.001 |
+
+Only the plane the chunks were cut for comes whole. Every other plane
+keeps one row or column of each 300 x 300 chunk, and the plane through
+a single cell keeps one value of each: a year at every depth in one
+place is 1.5 GB for 18,615 numbers. ([`make_margins.py`](make_margins.py)
+computes this table from the refs and reads the three planes below.)
+
+### Depth by time at one place
+
+![Temperature by depth and week through 2010 in the East Australian Current](margin-depth-time.png)
+
+The section 4 cell, weekly, through the top 545 m: 1,802 chunks, 165 MB,
+about 4 minutes. The warm eddy near day 20 reaches below 300 m; those
+near day 105 and day 175 are shallower; the year at every depth daily would cost ten times
+this.
+
+### Latitude by time along the date line
+
+![Surface temperature along 180E by latitude and day of 2010](margin-lat-time.png)
+
+One chunk column a day at the surface: 1,825 chunks, 135 MB, about 2.5
+minutes. The seasons swing across both hemispheres; the white line near
+17S is Fiji.
+
+### Longitude by time along the equator
+
+![Surface temperature along the equator by longitude and day of 2010](margin-lon-time.png)
+
+One chunk row a day: 4,380 chunks, 263 MB, about 6 minutes. 2010 is the
+turn from El Nino to La Nina: the eastern Pacific cold tongue (200 to
+280E) strengthens from about day 140, and the slanting stripes across it
+are tropical instability waves travelling west.
+
+## 6. Another coordinate system: Prydz Bay in polar stereographic
+
+![Surface temperature off the Amery Ice Shelf and Prydz Bay on the first of each month of 2010, in polar stereographic](polar-amery.png)
+
+The first day of each month at the surface, around Prydz Bay and the
+front of the Amery Ice Shelf (the white region to the left is the
+continent and the ice shelf, which the model does not cover), warped by
+`wxy warp` to Antarctic polar stereographic (EPSG:3031) at about 3 km.
+The bay warms to 2 or 3 degrees in February and sits at the freezing
+point from June to November.
+
+`wxy warp` warps every slice of the leading dimensions, so
+[`make_polar.py`](make_polar.py) first cuts the table: the 720 rows for
+those twelve days at the top level, renumbered, with an `arrays.json`
+whose shape and time coordinate match. The cut names the same chunks in
+the same files on THREDDS; nothing is copied. Then:
+
+```sh
+wxy warp cut-amery amery.zarr --source-array /temp --crs EPSG:3031 \
+  --extent 1.5e6 -0.2e6 3.3e6 1.6e6 --size 600 600 -r bilinear
+```
+
+The plan reads 36 chunks, three for each day, and the warp took 17 s
+from a cloud machine. A table cut is the workaround for
+choosing a subset of the leading dimensions on the command line, the gap
+noted above; it also shows how cheap a new view of the same bytes is.

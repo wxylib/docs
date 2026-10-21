@@ -28,6 +28,7 @@ class Table:
         with fs.open_input_stream(f"{root}/flat/arrays.json") as f:
             meta = json.loads(f.read())
         self.meta = next(a for a in meta["arrays"] if a["array"] == array)
+        self.arrays_json = meta
         t = pq.read_table(f"{root}/flat/refs_{array}.parquet", filesystem=fs,
                           columns=["dim_0", "dim_1", "dim_2", "dim_3",
                                    "present", "path", "offset", "size"])
