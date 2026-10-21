@@ -14,6 +14,10 @@ requests.
 - [Sentinel-2 on a web map](https://wxylib.org/web/s2.html): a STAC
   search of the map view, and the chosen scene's raw band COGs warped onto
   the map's own grid. Deep links take `?from=` and `?to=` dates.
+- [BRAN2023 from its byte table](https://wxylib.org/web/bran.html): a
+  year of daily ocean temperature read in place from netCDF on NCI
+  THREDDS, chunk by chunk, from a table of offsets. Plain JavaScript, no
+  wasm: the table needs no library. Deep links take `?at=lon,lat`.
 
 ```{=html}
 <iframe class="demo" src="https://wxylib.org/web/" title="wxylib browser demos" loading="lazy"></iframe>
