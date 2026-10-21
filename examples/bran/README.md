@@ -10,7 +10,7 @@ views of one set of byte ranges:
 
 | View | What it is | Who reads it |
 |---|---|---|
-| `mdim.vrt` | a GDAL multidimensional mosaic VRT: the plan, file by file | GDAL |
+| `mdim.vrt` | a GDAL multidimensional mosaic VRT: the plan, file by file | GDAL, and xarray through GDAL's xarray backend |
 | `flat/` | the mdim-refs table: `arrays.json` plus `refs_temp.parquet`, one row per chunk (`path`, `offset`, `size`), and `sources.parquet` | wxy, DuckDB, Arrow, anything that reads Parquet |
 | `kerchunk/` | the same rows as a kerchunk Parquet reference store | fsspec and xarray, wxy |
 | `icechunk/` | an Icechunk repository of virtual chunks | Icechunk and xarray, wxy |
