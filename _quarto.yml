@@ -75,6 +75,8 @@ website:
           href: examples/nonaffine/README.md
         - text: "A month of OISST as virtual Zarr"
           href: oisst-virtual.md
+        - text: "A year of BRAN2023 through its byte table"
+          href: examples/bran/README.md
         - text: "Which CRS strings work where"
           href: crs-input.md
     - title: "Explainers"
