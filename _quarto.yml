@@ -21,13 +21,15 @@ project:
     - vignettes/points/README.md
     - examples/zonal/README.md
     - examples/nonaffine/README.md
+    - examples/bran/README.md
+    - examples/cmems/README.md
     - explainers/*.qmd
     - explainers/*.md
     # wxylib/design, checked out here by the publish workflow
     - design/README.md
     - design/docs/*.md
     - design/specs/*.md
-    - design/measurements/*/README.md
+    - design/measurements/cop30/README.md
 
 website:
   title: "wxylib"
@@ -77,6 +79,8 @@ website:
           href: oisst-virtual.md
         - text: "A year of BRAN2023 through its byte table"
           href: examples/bran/README.md
+        - text: "Four estimates of one sea (draft)"
+          href: examples/cmems/README.md
         - text: "Which CRS strings work where"
           href: crs-input.md
     - title: "Explainers"
@@ -137,6 +141,10 @@ website:
               href: design/docs/m10-overlapping-mosaics.md
             - text: "m11 Quiet operations"
               href: design/docs/m11-quiet-operations.md
+            - text: "m13 Four views of one byte table"
+              href: design/docs/m13-four-views.md
+            - text: "m15 mdim-refs reconciliation"
+              href: design/docs/m15-mdim-refs-reconciliation.md
         - section: "Specs"
           contents:
             - text: "mdim-refs 0.2"

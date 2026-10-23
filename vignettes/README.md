@@ -12,6 +12,8 @@ open, and says plainly where it stops.
 | [Values at points: which method did you use?](points/README.md) | Nearest versus interpolated sampling, and what it costs ([raster_sampling](https://github.com/uw-cryo/raster_sampling)) | `python run.py` |
 | [Zonal statistics by lazy rasterization](../examples/zonal/README.md) | Zonal stats of a large raster over many polygons without running out of memory ([Pangeo](https://discourse.pangeo.io/t/advice-for-scalable-raster-vector-extraction/4129)) | `python bench.py` |
 | [Polygons on grids that are not a regular lattice](../examples/nonaffine/README.md) | Coverage fractions on rotated, rectilinear and curvilinear grids: move the polygon to index space, or the cells to the polygon? | `python plot.py` |
+| [A year of ocean reanalysis through its byte table](../examples/bran/README.md) | Reading a year of BRAN2023 netCDF4 on THREDDS by byte ranges, without copying it, through four views of one reference store | `python bran_table.py` |
+| [Four estimates of one sea (draft)](../examples/cmems/README.md) | BRAN2023, GHRSST MUR and Copernicus Marine Zarr side by side over the Tasman Sea | `python fetch.py`, then `python make_figures.py` |
 
 The scripts need the `wxy` binary from [wxylib/core](https://github.com/wxylib/core)
 (`cargo build --release -p wxy-cli`, then point `WXY` at

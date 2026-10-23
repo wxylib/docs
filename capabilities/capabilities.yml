@@ -17,8 +17,8 @@
 # moved on since.
 
 reviewed:
-  core: 3abd248
-  date: 2026-10-18
+  core: 4b74450
+  date: 2026-10-22
   py_pin: 39b07bb
   r_pin: 39b07bb
 
@@ -88,13 +88,13 @@ rung_by_verb:
       refs: [built, "arrays referenced whatever their georef"]
     R1:
       model: [built, "`Affine`, `Regular1`"]
-      read: [built, "tiled GeoTIFF/COG, chunky or planar, overviews; Zarr with GeoZarr `spatial:`/`proj:`"]
+      read: [built, "tiled GeoTIFF/COG, chunky or planar, overviews, local or https; Zarr v2/v3 with GeoZarr `spatial:`/`proj:`, local or by URL"]
       normalise: [na, "target of normalisation"]
       warp: [built, "chunked like gdalwarp, scaled kernels, `-ovr auto`, `-wm`, globe wrap, extra dims streamed"]
       points: [built, "near, bilinear, cubic, cubicspline"]
       zonal: [built, "centre, all-touched, exact coverage"]
       write: [built, "GeoZarr grid, windowed writer"]
-      refs: [partial, "TIFF scan (no LZW, no predictor); mdim-refs table to Icechunk"]
+      refs: [built, "mdim-refs and kerchunk Parquet tables read directly (`wxy-refs`), file, https or s3 sources; TIFF horizontal predictor (`wxy-predictor`); Icechunk as a sink; no LZW"]
     R2:
       model: [built, "`Rectilinear`"]
       read: [built, "CF 1D coordinate arrays in Zarr"]
@@ -153,11 +153,11 @@ api_surface:
   rows:
     - name: Open GeoTIFF / COG
       rust: [built, "`wxy-tiff`: path, any `object_store`"]
-      cli: [built, "local file"]
+      cli: [built, "local file or https URL"]
       web: [built, "HTTP range requests"]
     - name: Open Zarr
       rust: [built, "`wxy-zarr` via zarrs, v2/v3, sharding"]
-      cli: [built, "store directory, `--array`"]
+      cli: [built, "store directory or URL, `--array`"]
       web: [none, "`Send`/`Sync` bound blocks wasm"]
     - name: Domain model, R2 to R1 test
       rust: [built, "`wxy-domain`, `normalise`"]
@@ -186,11 +186,11 @@ api_surface:
       cli: [built, "warp output"]
       web: [na, "n/a"]
     - name: Virtual references
-      rust: [partial, "`scan_tiff`, `from_refs_table`, Icechunk write/read"]
-      cli: [none, "example only"]
+      rust: [built, "`wxy-refs`: mdim-refs and kerchunk Parquet as zarrs storage, `remap`; `wxy-virtual`: `scan_tiff`, Icechunk write/read"]
+      cli: [built, "a table directory or `s3://` prefix as the source of `warp`, `--remap`"]
     - name: Byte-range cache
       rust: [built, "`wxy-cache`, Parquet rows"]
-      cli: [partial, "`--cache`, GeoTIFF only"]
+      cli: [partial, "`--cache` for GeoTIFF and byte-reference tables; not Zarr by URL"]
     - name: CRS input
       span: [partial, "Pure Rust proj4rs everywhere: EPSG codes and PROJ strings, no WKT or PROJJSON. `wxy warp --crs` takes EPSG only, since GeoZarr `proj:` has nowhere to record a PROJ string. Real PROJ is the open question ([rust-proj-capability](https://github.com/mdsumner/rust-proj-capability)); proj4rs lacks polar LAEA and AEQD. See [Which CRS strings work where](crs-input.md)."]
     - name: Packaging
@@ -200,13 +200,16 @@ api_surface:
 
 # Cards under "Potential". body is a paragraph, or items is a list.
 potential:
-  - tag: "S3c, first slice in core"
+  - tag: "S3c, built; scale and CI open"
     title: Flat refs store
     body: >-
-      A zarrs storage over the mdim-refs Parquet export. Virtual data reads
-      without writing an Icechunk repo first, plans report real stored
-      bytes, and the cache sees every virtual read. It is also the cheapest
-      route to bindings, since a table is all a host needs to hand over.
+      A zarrs storage over the mdim-refs Parquet export (and kerchunk
+      Parquet). Virtual data reads without writing an Icechunk repo first,
+      the cache sees every virtual read, and a year of BRAN2023 reads
+      identically to GDAL. Open: a many-chunks-per-file fixture in CI,
+      tables of tens of millions of rows, and real stored bytes in plain
+      `--dry-run` plans. It is also the cheapest route to bindings, since a
+      table is all a host needs to hand over.
   - tag: "S6, spikes exist"
     title: Bindings of the real surface
     body: >-
@@ -217,9 +220,11 @@ potential:
   - tag: S7
     title: The virtual scheme
     body: >-
-      Select, remap, combine and compute, serialised and written by the
-      library: the VRT replacement, mosaics with gdalbuildvrt-style
-      validation, and the place features and meshes join grids.
+      Select, remap, combine and compute, written by the library: mosaics
+      with gdalbuildvrt-style validation, and the place features and meshes
+      join grids. It reads the mosaic VRT subset and the mdim-refs table as
+      its inputs; any further serialisation is decided at its gate, not a
+      new format by default.
   - tag: S8 and later
     title: Mesh half of the ladder
     items:
