@@ -22,5 +22,9 @@ by the script beside it.
   fractions.
 - [Overview selection](overviews.md): gdalwarp's `-ovr AUTO` rule for
   which resolution level a warp reads, checked against gdalwarp itself.
+- [Multidimensional VRT views](mdim-vrt.md): which sources GDAL opens
+  on a read of an `mdim.vrt`, why a missing `SourceSlab` count makes a
+  one-day read open the whole series, and the rule and check for
+  producers.
 - [What the tests check](testing.qmd): GDAL as the oracle, and the bar of
   identity.
