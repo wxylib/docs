@@ -98,6 +98,8 @@ website:
           href: explainers/rasterize.md
         - text: "Overview selection"
           href: explainers/overviews.md
+        - text: "Multidimensional VRT views"
+          href: explainers/mdim-vrt.md
         - explainers/testing.qmd
     - title: "Design"
       contents:
