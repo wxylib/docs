@@ -6,9 +6,13 @@ around that point into one value. This page explains GDAL's warp kernels
 for nearest, bilinear and cubic, the details that decide their last digit,
 and how wxylib reproduces them.
 
-The code is `wxy-resample` in [wxylib/core](https://github.com/wxylib/core)
-(`crates/wxy-resample/src/lib.rs` and `sample.rs`). The GDAL code it ports
-is `alg/gdalwarpkernel.cpp` (GDAL 3.12).
+The code is the `warp` module of
+[rwarp](https://github.com/hypertidy/rwarp) (`src/warp.rs`), which
+`wxy-warp` in [wxylib/core](https://github.com/wxylib/core) calls once
+per chunk. The GDAL code it ports is `alg/gdalwarpkernel.cpp` (GDAL 3.14,
+the version of wxylib's oracles). Until core#22, wxylib carried its own
+port of the GDAL 3.12 kernels (`wxy-resample`); it was retired once the
+oracles moved to GDAL 3.14, so that one port, in rwarp, serves both.
 
 ## The weights
 
@@ -32,7 +36,10 @@ When the target is coarser than the source, a 1:1 kernel samples the
 source: a target cell four source cells wide still reads only the 2 or 4
 cells nearest its centre, and fine detail aliases into patterns that are
 not in the data. GDAL instead stretches the kernel by the chunk's scale
-`s` (target size over source window size, below 1 for a coarser target):
+`s` (below 1 for a coarser target), which GDAL 3.13 and later estimate by
+transforming unit squares sampled over the chunk (rwarp's
+`estimate_scale`; GDAL 3.12 took the ratio of the chunk's target size to
+its source window size):
 the weight of a cell at distance `d` becomes `w(d * s)`, and the radius
 grows to `ceil(r / s)`. Bilinear at a quarter scale covers 8 cells per
 axis rather than 2, cubic 16 rather than 4, and the weights are normalised
@@ -46,7 +53,8 @@ centre) warped with bilinear to a grid about ten times coarser. GDAL's
 stretched kernel averages the fine outer rings to grey; `wxy warp`, which
 ports it, gives the same 25,600 values. `wxy warp --plain` uses a 1:1
 kernel and shows rings where the source has none at that scale. The figure
-is made by [kernels-figure.py](kernels-figure.py). (The source panel is
+is made by [kernels-figure.py](kernels-figure.py) (drawn with GDAL 3.12
+and the earlier port). (The source panel is
 itself drawn at reduced size, so its outer rings alias on screen.)
 
 A scale at or above 0.95 counts as 1:1 (the hand-written 4 and 16 tap
@@ -100,7 +108,7 @@ mistaken for missing data.
 
 Floating point addition is not associative, so the order of the sums
 decides the last bit, which in turn decides which way a value rounds to
-an integer type. wxylib follows GDAL's order:
+an integer type. rwarp follows GDAL's order:
 
 - the stretched no-mask kernel sums four rows at a time with four lanes
   per row, combined as `(lane 0 + lane 2) + (lane 1 + lane 3)`, the order
@@ -111,24 +119,15 @@ an integer type. wxylib follows GDAL's order:
 
 ## How wxylib does it
 
-`wxy-resample` has no transforms and no I/O. It takes a window of source
-cells (with an optional validity mask) and a position in it; the chunked
-warp in `wxy-warp` supplies the window, the position and the scale.
-
-| GDAL | wxylib (`wxy-resample`) |
-|------|-------|
-| kernel radius `anGWKFilterRadius` | `Method::radius` |
-| scale in `PerformWarp` | `Scale::ratios`, `Scale::new` |
-| `GWKResampleNoMasksOrDstDensityOnlyThread` | `Kernel::value` |
-| `GWKBilinearResampleNoMasks4SampleT` | `bilinear4_plain` |
-| `GWKCubicResampleNoMasks4SampleT` | `cubic4_plain` |
-| `GWKResampleNoMasks_SSE2_T` | `Kernel::scaled_plain` |
-| `GWKRealCase` kernels | `Kernel::density` |
-| `GWKBilinearResample4Sample`, `GWKCubicResample4Sample` | `bilinear4`, `cubic4` |
-| `GWKResample` | `Kernel::general` |
-| `GWKComputeWeights` | `Kernel::weights` |
-| `GWKSetPixelValueReal` | `write_density` |
-| `GWKClampValueT`, `AvoidNoData` | `Sample::clamp_from`, `Sample::nudge` (`sample.rs`) |
+rwarp's `warp` takes a source buffer (one chunk's window, with its offset
+in the full source), a transformer, the target size and offset, and
+options: the method, the kernel scale (`KernelScaling::Fixed` with the
+chunk's scale here), nodata and, for average and mode, the footprint and
+tie rule. `wxy-warp` plans the chunks and windows as GDAL does (see
+[the warper](warper.md)), estimates each chunk's scale with
+`estimate_scale`, and calls `warp` once per chunk. It wraps the
+transformer to add GDAL's exact retry for points just outside a window
+(`GWKCheckAndComputeSrcOffsets`), which rwarp leaves to its caller.
 
 Point extraction does not use these kernels: GDAL's point reads use
 `InterpolateAtPoint`, a different implementation, which `wxy-warp` ports
@@ -138,8 +137,8 @@ separately (`extract.rs`).
 
 Through the warps. The oracle cases in
 [wxylib/fixtures](https://github.com/wxylib/fixtures) (`warp/`, made by
-`scripts/make_warp_fixtures.py` with GDAL through rasterio) run every
-kernel path:
+`scripts/make_warp_fixtures.py` with GDAL 3.14dev through osgeo.gdal) run
+every kernel path:
 
 - byte, int16, uint16 and float32 sources, so both the no-mask and the
   masks path;
@@ -151,7 +150,12 @@ kernel path:
   and the stretched kernels.
 
 `cargo test -p wxy-warp` (`tests/gdal_oracle.rs`) requires every cell of
-every case to equal GDAL's, for nearest, bilinear and cubic. A second test
+every case to equal GDAL's, for nearest, bilinear and cubic. Lanczos and
+average agree in all but a handful of cells, off by one or two after
+rounding; mode agrees for integer types, while for floating-point types
+GDAL only moves its mode to a value on that value's second source cell,
+so continuous data keeps the first value, where rwarp takes the value
+covering the most area. A second test
 (`plain_kernel_samples_coarse_targets`) checks that the 1:1 kernel of
 `--plain` does differ from GDAL on a coarser target, so the stretch is
 what makes the match. The figure above repeats both checks on a harder

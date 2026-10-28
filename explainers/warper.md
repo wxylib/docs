@@ -7,10 +7,10 @@ does more than the loop, and the extra steps decide the numbers it writes.
 This page explains those steps, where each one lives in wxylib, and how the
 two are kept identical.
 
-The code is `wxy-warp` (`crates/wxy-warp/src/chunked.rs`) and
-`wxy-resample` in [wxylib/core](https://github.com/wxylib/core). The GDAL
-code it ports is `alg/gdalwarpoperation.cpp` and `alg/gdalwarpkernel.cpp`
-(GDAL 3.12).
+The code is `wxy-warp` (`crates/wxy-warp/src/chunked.rs`) in
+[wxylib/core](https://github.com/wxylib/core), with the kernels from
+[rwarp](https://github.com/hypertidy/rwarp). The GDAL code it ports is
+`alg/gdalwarpoperation.cpp` and `alg/gdalwarpkernel.cpp` (GDAL 3.14).
 
 ## The steps in GDAL
 
@@ -45,15 +45,18 @@ code it ports is `alg/gdalwarpoperation.cpp` and `alg/gdalwarpkernel.cpp`
    10 cells when any point failed), and a window covering more than 90% of
    the source width or height takes all of it.
 
-4. **The kernel scale** (`GDALWarpKernel::PerformWarp`). The ratio of a
-   chunk's target size to its source window size says whether the target
-   is coarser than the source. If it is (a ratio below 1), bilinear and
-   cubic kernels are stretched by that ratio so each target cell averages
-   over all the source cells under it, rather than sampling four or
-   sixteen of them. A ratio within 0.05 of 1/n snaps to 1/n. This is
-   GDAL 3.12's rule, which wxylib's oracles use. GDAL 3.13 replaced it
-   with a scale sampled from unit squares transformed over the chunk;
-   rwarp 0.2 (`estimate_scale`) follows the newer rule.
+4. **The kernel scale** (`GDALWarpKernel::PerformWarp`). GDAL transforms
+   unit squares sampled over the chunk to the source and measures them, to
+   say whether the target is coarser than the source. If it is (a scale
+   below 1), bilinear, cubic and lanczos kernels are stretched by that
+   scale so each target cell averages over all the source cells under it,
+   rather than sampling a few of them. A scale within 0.05 of 1/n snaps
+   to 1/n. This is the rule of GDAL 3.13 and later, which wxylib's
+   oracles (GDAL 3.14) and rwarp's `estimate_scale` use; GDAL 3.12 took
+   the ratio of the chunk's target size to its source window size. GDAL
+   samples the squares over the chunk without adding its offset in the
+   target, so every chunk is measured at the target's top-left; wxylib
+   does the same to match.
 
 5. **The kernel loop.** For each target cell in the chunk, GDAL transforms
    its centre, checks it lands in the window (retrying with the exact
@@ -85,9 +88,8 @@ for nearest, bilinear and cubic.
 If the chunks only saved memory, any chunking would do. They also change
 the output:
 
-- **Kernel scale** is set per chunk from its window (step 4). A chunk
-  whose window is a little wider gets a slightly different stretch, and
-  different bilinear and cubic values.
+- **Kernel scale** is set per chunk (step 4), and different chunks can
+  get different stretches, and so different bilinear and cubic values.
 - **Window edges** clip the kernel: a cell near a window edge sees fewer
   source cells than it would in a larger window.
 - **Approximation runs** follow chunk rows (step 1), so where the
@@ -109,11 +111,9 @@ over a transformer:
 | `ComputeSourceWindow` | `Planner::source_window` |
 | `ComputeSourceWindowTransformPoints` | `Planner::sample` |
 | `ComputeSourceWindowStartingFromSource` | `Planner::probe_source` |
-| kernel scale in `PerformWarp` | `chunk_scale`, `Scale::ratios` (`wxy-resample`) |
-| `GWKCheckAndComputeSrcOffsets` | `src_offset` |
-| `GWKAdjustSrcOffsetOnEdge` | `adjust_on_edge` |
-| warp kernels (nearest, bilinear, cubic) | `Kernel::value`, `Kernel::density` (`wxy-resample`) |
-| warp kernels (lanczos, average, mode) | rwarp's `warp`, one call per chunk (`warp_band_rwarp`) |
+| kernel scale in `PerformWarp` | `chunk_scale`, through rwarp's `estimate_scale` |
+| retry in `GWKCheckAndComputeSrcOffsets` | `Retry`, a transformer wrapper per chunk |
+| warp kernels (every method) | rwarp's `warp`, one call per chunk (`warp_band`) |
 
 Two things are organised differently, without changing the values:
 
@@ -122,9 +122,9 @@ Two things are organised differently, without changing the values:
   region as whole source chunks (COG tiles or Zarr chunks). Any leading
   dimensions (time, depth, band) are then warped slice by slice under the
   same plan, so a 4D store streams through without being loaded.
-- **The kernels have no I/O and no transforms.** `wxy-resample` takes a
-  window of cells and a position in it, and nothing else; the chunk loop
-  in `wxy-warp` supplies both (see [the kernels](kernels.md)).
+- **The kernels live in rwarp.** Each chunk's source window, target
+  size and offset, and scale go to one `rwarp::warp::warp` call (see
+  [the kernels](kernels.md)).
 
 And a few things differ on purpose, each with a switch:
 
@@ -144,10 +144,7 @@ And a few things differ on purpose, each with a switch:
 
 ## Lanczos, average and mode
 
-These run rwarp 0.2's kernels inside the same chunk plan. Each chunk's
-source window and target cells go to one `rwarp::warp::warp` call (with
-`dst_col_off` and `dst_row_off` placing the chunk in the full target),
-at the scale step 4 gives the chunk.
+These run in the same chunk plan as the other methods.
 
 - **Average** is the area-weighted mean of the valid source cells a
   target cell covers. By default the cover is GDAL's box between the
@@ -185,13 +182,17 @@ rule), and `world-to-3031-wm1` into 4, with the memory limit at 1 MB
 (`WarpOptions::memory_limit`, `wxy warp --wm`, gdalwarp's `-wm`).
 `cargo test -p wxy-warp` (`tests/gdal_oracle.rs`) warps each and compares
 with GDAL's output. The bar is identity: every cell, every case.
-Lanczos, average and mode have no GDAL oracles yet (they wait on a
-fixtures run, wxylib/fixtures#10); `tests/area_kernels.rs` checks what
-they promise instead: tiles warped separately equal the whole, mode
-returns only source values, and the box and exact footprints agree on
-aligned blocks.
+Lanczos, average and mode have oracles too (GDAL 3.14dev): lanczos and
+average differ from GDAL in a handful of cells by one or two after
+rounding, and mode for floating-point types differs by design (see
+[the kernels](kernels.md)), so the test reports those rather than
+failing on them. `tests/area_kernels.rs` checks what these methods
+promise: tiles warped separately equal the whole, mode returns only
+source values, and the box and exact footprints agree on aligned
+blocks.
 
-Larger splits were checked for this page:
+Larger splits were checked for this page (with GDAL 3.12 and wxylib's
+earlier kernel port, before the move to rwarp's kernels):
 
 - **The chunk list.** For five target grids (polar stereographic targets
   of four extents from the world fixture, and the polar fixture to

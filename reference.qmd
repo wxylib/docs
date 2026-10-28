@@ -25,7 +25,6 @@ drift.
 | `wxy-zarr` | Zarr reads through zarrs, georeferenced by GeoZarr `spatial:`/`proj:` or CF coordinates; writes GeoZarr grids. |
 | `wxy-geozarr` | The GeoZarr `spatial:` and `proj:` conventions on their own, usable by any Zarr tool. |
 | `wxy-virtual` | Virtual Zarr: tiled TIFF byte ranges or a byte-reference table as Icechunk virtual references, read back as Zarr. |
-| `wxy-resample` | GDAL's warp kernels in GDAL's arithmetic order, scaled when the target is coarser. |
 | `wxy-warp` | Plan, fetch, resample: regular, rectilinear and curvilinear sources, extra dimensions streamed under one plan; values at points and cells under polygons. |
 | `wxy-cache` | A persistent byte-range cache kept as Parquet rows. |
 | `wxy-cli` | The `wxy` command: `warp`, `points`, `zonal`, each with `--dry-run`. |
