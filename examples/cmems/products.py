@@ -13,7 +13,7 @@ Every reader returns (values, lon, lat[, depth]) as float32 in degrees C
 (or the variable's own unit), NaN where there is no ocean, with latitude
 increasing.
 """
-import os, re, sys
+import os, re, sys, threading
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -117,24 +117,34 @@ def _times(arr):
     m = re.match(r"(\w+) since (.+)", units)
     step = {"seconds": 1, "minutes": 60, "hours": 3600, "days": 86400}[m.group(1)]
     origin = datetime.fromisoformat(m.group(2).strip().replace("Z", "").split(".")[0])
-    v = arr.Read()
-    return [origin + timedelta(seconds=float(s) * step) for s in np.asarray(v, "f8")]
+    v = np.asarray(arr.ReadAsArray(), "f8")
+    return [origin + timedelta(seconds=float(s) * step) for s in v]
 
 
 def arco(name):
-    """The root group of a Copernicus ARCO store and its coordinates."""
-    if name not in _arco:
+    """The root group of a Copernicus ARCO store and its coordinates, one
+    per thread: a GDAL dataset is not safe to read from two threads at once
+    (shared, a threaded series gets other days' values on some days)."""
+    key = (name, threading.get_ident())
+    if key not in _arco:
         url = CMEMS.get(name, name)
         ds = gdal.OpenEx(f'ZARR:"/vsicurl/{url}"', gdal.OF_MULTIDIM_RASTER)
         g = ds.GetRootGroup()
         co = {"ds": ds, "root": g, "url": url}
+        names = g.GetMDArrayNames()
         for k in ("longitude", "latitude", "depth"):
-            a = g.OpenMDArray(k)
-            if a is not None:
-                co[k] = np.asarray(a.ReadAsArray(), "f8")
+            if k in names:
+                co[k] = np.asarray(g.OpenMDArray(k).ReadAsArray(), "f8")
+        # GLORYS12 (202311) has no depth: its vertical axis is "elevation",
+        # negative and deepest first. Keep depth surface first, and the
+        # store's own axis name for the reads.
+        co["zdim"] = "depth"
+        if "depth" not in co and "elevation" in names:
+            co["depth"] = -np.asarray(g.OpenMDArray("elevation").ReadAsArray(), "f8")[::-1]
+            co["zdim"] = "elevation"
         co["time"] = _times(g.OpenMDArray("time"))
-        _arco[name] = co
-    return _arco[name]
+        _arco[key] = co
+    return _arco[key]
 
 
 def cmems(name, var, day, bbox, z=None):
@@ -147,9 +157,12 @@ def cmems(name, var, day, bbox, z=None):
     x0, x1 = _span(co["longitude"], bbox[0], bbox[1])
     y0, y1 = _span(co["latitude"], bbox[2], bbox[3])
     start, count = [t], [1]
-    if "depth" in dims:
+    zdim = co["zdim"] in dims
+    if zdim:
         z = z or (0, 1)
-        start.append(z[0]); count.append(z[1] - z[0])
+        nz = len(co["depth"])
+        z0 = z[0] if co["zdim"] == "depth" else nz - z[1]
+        start.append(z0); count.append(z[1] - z[0])
     start += [y0, x0]; count += [y1 - y0, x1 - x0]
     v = np.frombuffer(a.Read(array_start_idx=start, count=count,
                              buffer_datatype=gdal.ExtendedDataType.Create(gdal.GDT_Float64)),
@@ -161,7 +174,9 @@ def cmems(name, var, day, bbox, z=None):
     if var == "analysed_sst" and np.nanmean(v) > 200:
         v = v - 273.15
     v = v[0]
+    if zdim and co["zdim"] == "elevation":
+        v = v[::-1]
     lon, lat = co["longitude"][x0:x1], co["latitude"][y0:y1]
-    if "depth" in dims:
+    if zdim:
         return v, lon, lat, co["depth"][z[0]:z[1]]
     return v, lon, lat
