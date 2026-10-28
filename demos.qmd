@@ -18,6 +18,13 @@ requests.
   year of daily ocean temperature read in place from netCDF on NCI
   THREDDS, chunk by chunk, from a table of offsets. Plain JavaScript, no
   wasm: the table needs no library. Deep links take `?at=lon,lat`.
+- [An editing canvas with CAD control](https://wxylib.org/web/edit.html):
+  draw and edit vector data exactly, with snapping, typed distance and
+  angle locks, an undoable operation log, a nudge brush, edits in a
+  chosen CRS with ground or grid measures, and a COG underlay warped into
+  the same frame. Opens on a sample; takes GeoJSON by file, drop or
+  `?url=`. The design is in
+  [m18](design/docs/m18-editing-canvas.md).
 
 ```{=html}
 <iframe class="demo" src="https://wxylib.org/web/" title="wxylib browser demos" loading="lazy"></iframe>
