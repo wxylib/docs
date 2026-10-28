@@ -6,7 +6,7 @@ title: "wxy command reference"
      edit by hand. Change the doc comments in
      crates/wxy-cli/src/main.rs in wxylib/core instead. -->
 
-Generated from the help text of `wxy 0.0.1`, built from [wxylib/core@3abd248](https://github.com/wxylib/core/tree/3abd24892c08d304ec6d2b7f5de61c14b82761de).
+Generated from the help text of `wxy 0.0.1`, built from [wxylib/core@cb17137](https://github.com/wxylib/core/tree/cb17137109b1fc1be2fbeda9a430484530bdd64e).
 Each section is exactly what `wxy <command> --help` prints.
 Worked examples are in the
 [how-tos](../vignettes/README.md).
@@ -37,7 +37,7 @@ Warp a GeoTIFF or Zarr array onto a target grid, written as GeoZarr
 Usage: wxy warp [OPTIONS] --crs <CRS> --extent <XMIN> <YMIN> <XMAX> <YMAX> --size <NCOL> <NROW> <SOURCE> <OUTPUT>
 
 Arguments:
-  <SOURCE>  Source: a GeoTIFF file, or a Zarr store directory
+  <SOURCE>  Source: a GeoTIFF file or https:// URL, or a Zarr store directory
   <OUTPUT>  Output Zarr store directory, created if missing
 
 Options:
@@ -48,7 +48,13 @@ Options:
       --size <NCOL> <NROW>
           Target size in cells: ncol nrow
   -r, --resampling <RESAMPLING>
-          Resampling method [default: near] [possible values: near, bilinear, cubic]
+          Resampling method [default: near] [possible values: near, bilinear, cubic, lanczos, average, mode]
+      --mode-ties <MODE_TIES>
+          With -r mode, the value kept when several cover the same area, as gdalwarp's -wo MODE_TIES [default: first] [possible values: first, min, max]
+      --exact-footprint <N>
+          With -r average or mode, intersect each target cell's outline (each edge cut into N segments) exactly with the source cells instead of GDAL's corner box: conservative remapping, in source cell area. About 25 times slower
+      --kernel-scale <X> <Y>
+          Kernel scale, target cells per source cell, for every chunk: x y (gdalwarp's -wo XSCALE= -wo YSCALE=). Without it the scale is estimated per chunk; give one to keep separately warped tiles seamless
       --error-threshold <ERROR_THRESHOLD>
           Maximum error of the approximate transformer, in pixels; 0 is exact [default: 0.125]
       --nodata <NODATA>
@@ -60,13 +66,15 @@ Options:
       --no-wrap
           Leave target cells beyond a 360 degree lon/lat source's edge empty, as GDAL's warper does, instead of wrapping longitude and reading pole rows
       --plain
-          Warp in one pass with a 1:1 kernel instead of chunk by chunk as GDAL's warper does. Faster on large targets, but bilinear and cubic then sample rather than smooth a target coarser than the source
+          Warp in one pass with a 1:1 kernel instead of chunk by chunk as GDAL's warper does. Faster on large targets, but bilinear, cubic and lanczos then sample rather than smooth a target coarser than the source
       --overview <OVERVIEW>
           Overview to read from a GeoTIFF with overviews, as gdalwarp's -ovr: auto (the coarsest still finer than the target), auto-N (N levels finer than that), N (overview N, 0 being the first) or none [default: auto]
       --bounds
           Place a curvilinear Zarr source by its CF cell bounds (the cell corners) instead of by its cell centres as GDAL does
       --cache <DIR>
-          Keep the source's bytes, as fetched, in this cache directory (append-only Parquet fragments) and read from it what it already holds. GeoTIFF sources only
+          Keep the source's bytes, as fetched, in this cache directory (append-only Parquet fragments) and read from it what it already holds. GeoTIFF sources (files or URLs; URL rows are validated by the server's etag) and byte-reference tables
+      --remap <TARGET>
+          For a byte-reference table source, the `remap` target its source paths are rewritten by (such as a mirror, or local copies)
       --wm <WM>
           Working memory one warp chunk may take, in MB, before it is split into smaller chunks (gdalwarp's -wm) [default: 64]
       --overwrite
@@ -85,7 +93,7 @@ Read a GeoTIFF or Zarr array at points (x,y lines on stdin), each chunk fetched 
 Usage: wxy points [OPTIONS] <SOURCE>
 
 Arguments:
-  <SOURCE>  Source: a GeoTIFF file, or a Zarr store directory
+  <SOURCE>  Source: a GeoTIFF file or https:// URL, or a Zarr store directory
 
 Options:
       --crs <CRS>                    CRS of the points (EPSG:NNNN or a PROJ string) [default: EPSG:4326]
@@ -105,7 +113,7 @@ Summarise a GeoTIFF or Zarr array over GeoJSON polygons (the cells GDAL's raster
 Usage: wxy zonal [OPTIONS] <SOURCE> <POLYGONS>
 
 Arguments:
-  <SOURCE>    Source: a GeoTIFF file, or a Zarr store directory
+  <SOURCE>    Source: a GeoTIFF file or https:// URL, or a Zarr store directory
   <POLYGONS>  GeoJSON: a FeatureCollection, a Feature, or a bare geometry, of Polygon or MultiPolygon
 
 Options:

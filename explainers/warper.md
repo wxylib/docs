@@ -50,7 +50,10 @@ code it ports is `alg/gdalwarpoperation.cpp` and `alg/gdalwarpkernel.cpp`
    is coarser than the source. If it is (a ratio below 1), bilinear and
    cubic kernels are stretched by that ratio so each target cell averages
    over all the source cells under it, rather than sampling four or
-   sixteen of them. A ratio within 0.05 of 1/n snaps to 1/n.
+   sixteen of them. A ratio within 0.05 of 1/n snaps to 1/n. This is
+   GDAL 3.12's rule, which wxylib's oracles use. GDAL 3.13 replaced it
+   with a scale sampled from unit squares transformed over the chunk;
+   rwarp 0.2 (`estimate_scale`) follows the newer rule.
 
 5. **The kernel loop.** For each target cell in the chunk, GDAL transforms
    its centre, checks it lands in the window (retrying with the exact
@@ -110,6 +113,7 @@ over a transformer:
 | `GWKCheckAndComputeSrcOffsets` | `src_offset` |
 | `GWKAdjustSrcOffsetOnEdge` | `adjust_on_edge` |
 | warp kernels (nearest, bilinear, cubic) | `Kernel::value`, `Kernel::density` (`wxy-resample`) |
+| warp kernels (lanczos, average, mode) | rwarp's `warp`, one call per chunk (`warp_band_rwarp`) |
 
 Two things are organised differently, without changing the values:
 
@@ -128,8 +132,39 @@ And a few things differ on purpose, each with a switch:
   edge read the other side, and pole rows are read rather than left empty.
   `--no-wrap` (CLI) gives GDAL's behaviour.
 - `--plain` warps in one pass through rwarp with a 1:1 kernel, skipping
-  the chunk plan: faster on large targets, but bilinear and cubic then
-  sample rather than smooth a coarser target.
+  the chunk plan: faster on large targets, but bilinear, cubic and
+  lanczos then sample rather than smooth a coarser target.
+- `--kernel-scale X Y` sets one kernel scale for every chunk, as
+  gdalwarp's `-wo XSCALE= -wo YSCALE=`. GDAL still pads each source
+  window for the scale it estimates, so a kernel stretched further is
+  clipped at the window edge; wxylib pads for the given scale too. With
+  one scale for all of them, tiles warped separately match the whole
+  warp. `--dry-run` reports each chunk's estimated `kernel_scale`, to
+  choose from.
+
+## Lanczos, average and mode
+
+These run rwarp 0.2's kernels inside the same chunk plan. Each chunk's
+source window and target cells go to one `rwarp::warp::warp` call (with
+`dst_col_off` and `dst_row_off` placing the chunk in the full target),
+at the scale step 4 gives the chunk.
+
+- **Average** is the area-weighted mean of the valid source cells a
+  target cell covers. By default the cover is GDAL's box between the
+  cell's transformed corners. `--exact-footprint N` intersects the
+  target cell's outline, each edge cut into N segments, exactly with
+  the source cells (through controlledburn): first-order conservative
+  remapping, about 25 times slower. Both measure area in source cell
+  space, which is planar in the source CRS, not area on the ellipsoid.
+- **Mode** keeps the value that covers the most area, for categories
+  such as land cover or masks. `--mode-ties first|min|max` breaks ties
+  as gdalwarp's `-wo MODE_TIES`; rwarp gives the same answer for every
+  data type.
+
+One GDAL behaviour shows through tiling: the box footprint detects a
+target cell straddling the antimeridian only when the chunk has another
+cell to its right, so a tile whose last column straddles it averages
+the whole source row between the cell's corners.
 
 Not ported: GDAL's retry with `CHECK_WITH_INVERT_PROJ` for windows with
 wild values (a PROJ switch the pure-Rust proj4rs backend does not have),
@@ -139,7 +174,7 @@ destination alpha, cutlines, and source masks other than nodata.
 
 GDAL is the oracle. [wxylib/fixtures](https://github.com/wxylib/fixtures)
 holds small source files and what GDAL's warper writes for them
-(`scripts/make_warp_fixtures.py`, through rasterio with the approximate
+(`scripts/make_warp_fixtures.py`, through osgeo.gdal with the approximate
 transformer at its default 0.125 pixel threshold). There are 13 source and
 target pairs, each with nearest, bilinear and cubic: global to Antarctic
 polar stereographic, polar to lon/lat, a 0 to 360 source across its seam,
@@ -150,6 +185,11 @@ rule), and `world-to-3031-wm1` into 4, with the memory limit at 1 MB
 (`WarpOptions::memory_limit`, `wxy warp --wm`, gdalwarp's `-wm`).
 `cargo test -p wxy-warp` (`tests/gdal_oracle.rs`) warps each and compares
 with GDAL's output. The bar is identity: every cell, every case.
+Lanczos, average and mode have no GDAL oracles yet (they wait on a
+fixtures run, wxylib/fixtures#10); `tests/area_kernels.rs` checks what
+they promise instead: tiles warped separately equal the whole, mode
+returns only source values, and the box and exact footprints agree on
+aligned blocks.
 
 Larger splits were checked for this page:
 
