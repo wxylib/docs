@@ -26,5 +26,8 @@ by the script beside it.
   on a read of an `mdim.vrt`, why a missing `SourceSlab` count makes a
   one-day read open the whole series, and the rule and check for
   producers.
+- [COG tiles as Zarr chunks](cog-tiles.md): the two steps that turn a
+  COG tile's bytes into values (ZSTD and the TIFF horizontal predictor),
+  how each view of a byte table names them, and who can decode each.
 - [What the tests check](testing.qmd): GDAL as the oracle, and the bar of
   identity.

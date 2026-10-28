@@ -23,6 +23,7 @@ project:
     - examples/nonaffine/README.md
     - examples/bran/README.md
     - examples/cmems/README.md
+    - examples/ghrsst/README.md
     - explainers/*.qmd
     - explainers/*.md
     # wxylib/design, checked out here by the publish workflow
@@ -81,6 +82,8 @@ website:
           href: examples/bran/README.md
         - text: "Four estimates of one sea (draft)"
           href: examples/cmems/README.md
+        - text: "Twenty-four years of MUR SST, one set of bytes"
+          href: examples/ghrsst/README.md
         - text: "Which CRS strings work where"
           href: crs-input.md
     - title: "Explainers"
@@ -100,6 +103,8 @@ website:
           href: explainers/overviews.md
         - text: "Multidimensional VRT views"
           href: explainers/mdim-vrt.md
+        - text: "COG tiles as Zarr chunks"
+          href: explainers/cog-tiles.md
         - explainers/testing.qmd
     - title: "Design"
       contents:
