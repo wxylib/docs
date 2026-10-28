@@ -29,5 +29,9 @@ by the script beside it.
 - [COG tiles as Zarr chunks](cog-tiles.md): the two steps that turn a
   COG tile's bytes into values (ZSTD and the TIFF horizontal predictor),
   how each view of a byte table names them, and who can decode each.
+- [Byte-reference tables](byte-tables.md): one row per chunk, the three
+  layers (physical, plan, view) behind a table over many files, finding
+  one chunk, the views a store is published as and who reads each, and
+  what a table has to state for its readers to agree.
 - [What the tests check](testing.qmd): GDAL as the oracle, and the bar of
   identity.

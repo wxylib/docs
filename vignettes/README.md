@@ -14,6 +14,7 @@ open, and says plainly where it stops.
 | [Polygons on grids that are not a regular lattice](../examples/nonaffine/README.md) | Coverage fractions on rotated, rectilinear and curvilinear grids: move the polygon to index space, or the cells to the polygon? | `python plot.py` |
 | [A year of ocean reanalysis through its byte table](../examples/bran/README.md) | Reading a year of BRAN2023 netCDF4 on THREDDS by byte ranges, without copying it, through four views of one reference store | `python bran_table.py` |
 | [Four estimates of one sea (draft)](../examples/cmems/README.md) | BRAN2023, GHRSST MUR and Copernicus Marine Zarr side by side over the Tasman Sea | `python fetch.py`, then `python make_figures.py` |
+| [Keep the bytes a run reads](cache/README.md) | Repeated runs over a remote raster without fetching the same tiles again, and without converting the file | `python run.py` |
 | [Twenty-four years of MUR SST, one set of bytes](../examples/ghrsst/README.md) | The GHRSST MUR COG archive on Source Cooperative read by GDAL through its published VRT, by zarr-python, by a 100-line script and by wxy, all from one byte table, with slots for the stores to come | `python read_vrt.py`, `python mur_table.py` |
 
 The scripts need the `wxy` binary from [wxylib/core](https://github.com/wxylib/core)

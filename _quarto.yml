@@ -19,6 +19,7 @@ project:
     - vignettes/browser/README.md
     - vignettes/curvilinear/README.md
     - vignettes/points/README.md
+    - vignettes/cache/README.md
     - examples/zonal/README.md
     - examples/nonaffine/README.md
     - examples/bran/README.md
@@ -72,6 +73,8 @@ website:
           href: vignettes/curvilinear/README.md
         - text: "Values at points"
           href: vignettes/points/README.md
+        - text: "Keep the bytes a run reads"
+          href: vignettes/cache/README.md
         - text: "Zonal statistics by lazy rasterization"
           href: examples/zonal/README.md
         - text: "Polygons on grids that are not a regular lattice"
@@ -105,6 +108,8 @@ website:
           href: explainers/mdim-vrt.md
         - text: "COG tiles as Zarr chunks"
           href: explainers/cog-tiles.md
+        - text: "Byte-reference tables"
+          href: explainers/byte-tables.md
         - explainers/testing.qmd
     - title: "Design"
       contents:
@@ -148,10 +153,20 @@ website:
               href: design/docs/m10-overlapping-mosaics.md
             - text: "m11 Quiet operations"
               href: design/docs/m11-quiet-operations.md
+            - text: "m12 Adaptive densify (bigcurve)"
+              href: design/docs/m12-bigcurve-densify.md
             - text: "m13 Four views of one byte table"
               href: design/docs/m13-four-views.md
+            - text: "m14 Unreferenced datasets"
+              href: design/docs/m14-unreferenced-datasets.md
             - text: "m15 mdim-refs reconciliation"
               href: design/docs/m15-mdim-refs-reconciliation.md
+            - text: "m16 Versioned byte-ref table"
+              href: design/docs/m16-versioned-byte-ref-table.md
+            - text: "m17 Self-describing stores"
+              href: design/docs/m17-self-describing-stores.md
+            - text: "m18 Editing canvas"
+              href: design/docs/m18-editing-canvas.md
         - section: "Specs"
           contents:
             - text: "mdim-refs 0.2"
