@@ -123,11 +123,11 @@ rwarp's `warp` takes a source buffer (one chunk's window, with its offset
 in the full source), a transformer, the target size and offset, and
 options: the method, the kernel scale (`KernelScaling::Fixed` with the
 chunk's scale here), nodata and, for average and mode, the footprint and
-tie rule. `wxy-warp` plans the chunks and windows as GDAL does (see
-[the warper](warper.md)), estimates each chunk's scale with
-`estimate_scale`, and calls `warp` once per chunk. It wraps the
-transformer to add GDAL's exact retry for points just outside a window
-(`GWKCheckAndComputeSrcOffsets`), which rwarp leaves to its caller.
+tie rule. rwarp's `plan` module plans the chunks and windows as GDAL does
+(see [the warper](warper.md)) and estimates each chunk's scale with
+`estimate_scale`; `warp_chunks` calls `warp` once per chunk. `warp` itself
+retries points just outside a window with an exact transform, as
+`GWKCheckAndComputeSrcOffsets` does.
 
 Point extraction does not use these kernels: GDAL's point reads use
 `InterpolateAtPoint`, a different implementation, which `wxy-warp` ports

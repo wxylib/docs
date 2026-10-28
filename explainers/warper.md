@@ -7,9 +7,9 @@ does more than the loop, and the extra steps decide the numbers it writes.
 This page explains those steps, where each one lives in wxylib, and how the
 two are kept identical.
 
-The code is `wxy-warp` (`crates/wxy-warp/src/chunked.rs`) in
-[wxylib/core](https://github.com/wxylib/core), with the kernels from
-[rwarp](https://github.com/hypertidy/rwarp). The GDAL code it ports is
+The code is [rwarp](https://github.com/hypertidy/rwarp) (the `plan`
+module plans the chunks, `warp` runs the kernels), called from `wxy-warp`
+in [wxylib/core](https://github.com/wxylib/core). The GDAL code it ports is
 `alg/gdalwarpoperation.cpp` and `alg/gdalwarpkernel.cpp` (GDAL 3.14).
 
 ## The steps in GDAL
@@ -104,16 +104,20 @@ windows and the same scales, not just using the same kernels.
 The port keeps GDAL's steps and their arithmetic order, as plain functions
 over a transformer:
 
-| GDAL | wxylib (`wxy-warp`, `chunked.rs` unless noted) |
+| GDAL | wxylib (rwarp, `plan.rs` unless noted) |
 |------|-------|
-| `GDALApproxTransform` | rwarp's `ApproxTransformer`, wrapped in `Approx` (`lib.rs`) |
-| `CollectChunkList` | `Planner::chunks` |
-| `ComputeSourceWindow` | `Planner::source_window` |
-| `ComputeSourceWindowTransformPoints` | `Planner::sample` |
-| `ComputeSourceWindowStartingFromSource` | `Planner::probe_source` |
-| kernel scale in `PerformWarp` | `chunk_scale`, through rwarp's `estimate_scale` |
-| retry in `GWKCheckAndComputeSrcOffsets` | `Retry`, a transformer wrapper per chunk |
-| warp kernels (every method) | rwarp's `warp`, one call per chunk (`warp_band`) |
+| `GDALApproxTransform` | rwarp's `ApproxTransformer`, wrapped in `Approx` (`wxy-warp`, `lib.rs`) |
+| `CollectChunkList` | `plan_chunks` (`ChunkPlanner::plan`) |
+| `ComputeSourceWindow` | `ChunkPlanner::source_window` |
+| `ComputeSourceWindowTransformPoints` | `ChunkPlanner::sample` |
+| `ComputeSourceWindowStartingFromSource` | `ChunkPlanner::probe_source` |
+| kernel scale in `PerformWarp` | `chunk_scale`, through `estimate_scale` (`warp.rs`) |
+| retry in `GWKCheckAndComputeSrcOffsets` | inside `warp` (`warp.rs`) |
+| warp kernels (every method) | `warp`, one call per chunk (`warp_chunks`) |
+
+`wxy-warp` sets the planner up as gdalwarp does
+(`ChunkOptions::gdalwarp`), plus padding the source window for a fixed
+kernel scale and the round-trip check for global sources.
 
 Two things are organised differently, without changing the values:
 
