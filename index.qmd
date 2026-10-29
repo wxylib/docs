@@ -35,6 +35,13 @@ a curvilinear grid to a polar map, values at points, zonal statistics.
 :::
 
 ::: {.card}
+### [Data walk-throughs](examples/index.qmd)
+Real archives read in place and checked against GDAL: GHRSST MUR SST on
+Source Cooperative, BRAN2023 on THREDDS, OISST, and Copernicus Marine
+Zarr.
+:::
+
+::: {.card}
 ### [Explainers](explainers/index.qmd)
 How each GDAL mechanism wxylib ports works, in GDAL and in wxylib, and
 how the two are checked against each other.
