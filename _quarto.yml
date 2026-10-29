@@ -20,6 +20,7 @@ project:
     - vignettes/curvilinear/README.md
     - vignettes/points/README.md
     - vignettes/cache/README.md
+    - examples/index.qmd
     - examples/zonal/README.md
     - examples/nonaffine/README.md
     - examples/bran/README.md
@@ -49,6 +50,8 @@ website:
         href: capabilities.qmd
       - text: How-tos
         href: vignettes/README.md
+      - text: Walk-throughs
+        href: examples/index.qmd
       - text: Explainers
         href: explainers/index.qmd
       - text: Demos
@@ -79,16 +82,20 @@ website:
           href: examples/zonal/README.md
         - text: "Polygons on grids that are not a regular lattice"
           href: examples/nonaffine/README.md
-        - text: "A month of OISST as virtual Zarr"
-          href: oisst-virtual.md
-        - text: "A year of BRAN2023 through its byte table"
-          href: examples/bran/README.md
-        - text: "Four estimates of one sea (draft)"
-          href: examples/cmems/README.md
-        - text: "Twenty-four years of MUR SST, one set of bytes"
-          href: examples/ghrsst/README.md
         - text: "Which CRS strings work where"
           href: crs-input.md
+    - title: "Walk-throughs"
+      contents:
+        - text: "All walk-throughs"
+          href: examples/index.qmd
+        - text: "Twenty-four years of MUR SST, one set of bytes"
+          href: examples/ghrsst/README.md
+        - text: "A year of BRAN2023 through its byte table"
+          href: examples/bran/README.md
+        - text: "A month of OISST as virtual Zarr"
+          href: oisst-virtual.md
+        - text: "Four estimates of one sea (draft)"
+          href: examples/cmems/README.md
     - title: "Explainers"
       contents:
         - explainers/index.qmd
