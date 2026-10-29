@@ -8,9 +8,10 @@ to the cell that holds it, and for a curved, sheared grid there is no
 formula for that: it is a search. This page explains how GDAL does the
 search, how wxylib ports it, and how the two are compared.
 
-The code is `crates/wxy-warp/src/geoloc.rs` in
+The code is [rwarp](https://github.com/hypertidy/rwarp)'s
+`geoloc_transform` module, called from `wxy-warp` in
 [wxylib/core](https://github.com/wxylib/core). The GDAL code it ports is
-`alg/gdalgeoloc.cpp` (GDAL 3.12).
+`alg/gdalgeoloc.cpp` (GDAL 3.14).
 
 ![Left: a swath placed by 2D lon/lat arrays. Middle: close-up of the quadrilaterals between array points, the backmap lattice, and the cell found for a target point. Right: the swath warped to polar stereographic](img/geoloc.png)
 
@@ -86,29 +87,31 @@ kernels are unchanged.
 
 ## How wxylib does it
 
-| GDAL | wxylib (`geoloc.rs`) |
+| GDAL | rwarp (`geoloc_transform`) |
 |------|-------|
-| `GDALGeoLocTransformInfo` | `GeoLoc` |
-| `LoadGeolocFinish` (extent of the arrays) | `GeoLoc::load_finish` |
-| `PixelLineToXY` | `GeoLoc::pixel_line_to_xy`, `pixel_line_to_xy_i` |
-| `GenerateBackMap` | `GeoLoc::generate_backmap`, `backmap_point` |
-| fill-nodata pass on the backmap | `fill_nodata`, `multi_filter` |
-| the backward transform (backmap, then ring search) | `GeoLoc::inverse` |
-| `GDALInverseBilinearInterpolation` | `inverse_bilinear` |
-| `OGRLinearRing` contains and touches tests | `Ring::holds` |
-| forward transform | `GeoLoc::forward` |
+| `GDALGeoLocTransformInfo` | `GeolocArrays` |
+| `PIXEL_OFFSET`, `LINE_STEP`, `GEOREFERENCING_CONVENTION` and the other options | `GeolocOptions` |
+| `PixelLineToXY` | `GeolocArrays::pixel_line_to_xy` |
+| forward transform | `GeolocArrays::pixel_to_geo` |
+| `GenerateBackMap`, its fill-nodata pass, then the ring search | `GeolocArrays::geo_to_pixel` with `GeolocInverse::Backmap` |
+| `GDALGenImgProjTransform` with a geolocation side | `GenImgGeolocTransformer` |
 
-It follows GDAL's arithmetic order and its block order (256 x 256 blocks,
-rows of blocks first), since the order in which samples reach the backmap
-decides which value a node keeps.
+The backmap follows GDAL's arithmetic order and its block order (256 x 256
+blocks, rows of blocks first), since the order in which samples reach the
+backmap decides which value a node keeps. rwarp's own default inverse
+(`GeolocInverse::QuadIndex`) searches an index of every quadrilateral
+instead, without a sampled backmap; wxylib asks for `Backmap`, so that its
+warps match GDAL's cell for cell.
+
+`wxy-warp` builds the `GeolocArrays` and decides one option itself: it
+interpolates longitudes across the antimeridian (`with_lon_wrap`) when the
+arrays' CRS is geographic and every longitude lies in -180 to 180, as GDAL
+does. Missing samples are NaN.
 
 `wxy-zarr` reads CF 2D longitude and latitude coordinates and gives them
 to the warper as a curvilinear mapping. Cell centres use `PIXEL_CENTER`,
 as GDAL does. With 2D CF bounds (`wxy warp --bounds`) the cell corners are
 used instead, through `TOP_LEFT_CORNER`.
-
-Only GDAL's in-memory backmap and its default options are ported:
-oversampling 1.3, no quadtree, no swapped axes.
 
 ## How the match is tested
 
