@@ -32,7 +32,8 @@ project:
     - design/README.md
     - design/docs/*.md
     - design/specs/*.md
-    - design/measurements/cop30/README.md
+    - design/docs/watch/*.md
+    - design/measurements/*/README.md
 
 website:
   title: "wxylib"
@@ -174,6 +175,42 @@ website:
               href: design/docs/m17-self-describing-stores.md
             - text: "m18 Editing canvas"
               href: design/docs/m18-editing-canvas.md
+            - text: "m19 Exact footprint"
+              href: design/docs/m19-exact-footprint.md
+            - text: "m20 Movement crates"
+              href: design/docs/m20-movement-crates.md
+            - text: "m21 Conservative regridding examples"
+              href: design/docs/m21-conservative-examples.md
+            - text: "m22 Array plan IR"
+              href: design/docs/m22-array-plan-ir.md
+            - text: "m23 Byte-ref harvesting"
+              href: design/docs/m23-byte-ref-harvesting.md
+            - text: "m24 Foundations hardening"
+              href: design/docs/m24-foundations-hardening.md
+            - text: "m25 VRT engine outside GDAL"
+              href: design/docs/m25-vrt-engine.md
+            - text: "m26 Bindings on Rust"
+              href: design/docs/m26-bindings-on-rust.md
+            - text: "m27 Oracle harness"
+              href: design/docs/m27-oracle-harness.md
+            - text: "m28 Warp output-grid defaults"
+              href: design/docs/m28-warp-output-grid.md
+            - text: "m29 VRT, reimagined"
+              href: design/docs/m29-vrt-reimagined.md
+        - section: "Watch notes"
+          contents:
+            - text: "CRS coverage"
+              href: design/docs/watch/crs-coverage.md
+            - text: "terrio and RustGIS"
+              href: design/docs/watch/opengeos.md
+            - text: "pyinterp regridding"
+              href: design/docs/watch/pyinterp.md
+            - text: "Rewrites of reference-library parts"
+              href: design/docs/watch/rewrites.md
+            - text: "roteiro-gis"
+              href: design/docs/watch/roteiro.md
+            - text: "deck.gl and math.gl projections"
+              href: design/docs/watch/visgl.md
         - section: "Specs"
           contents:
             - text: "mdim-refs 0.2"
